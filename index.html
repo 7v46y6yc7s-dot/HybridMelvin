@@ -141,6 +141,23 @@ footer{text-align:center}
   main .history-item{flex-wrap:wrap}
 }
 
+
+/* GLOBALER RESPONSIVE-SCHUTZ: gilt auch fuer dynamisch erzeugte Profil- und Planinhalte */
+html,body{max-width:100%;overflow-x:hidden}
+body{width:100%;position:relative}
+main{width:100%;max-width:760px;overflow-x:clip}
+main,main *{box-sizing:border-box;min-width:0}
+main section,main .card,main .week-block,main .week-fold,main .day-detail,main .exercise{width:100%;max-width:100%}
+main .row,main .profile-actions,main .plan-choice{width:100%;max-width:100%;min-width:0}
+main .row>*{flex:1 1 0;min-width:0;max-width:100%}
+main input,main select,main textarea{width:100%;max-width:100%;min-width:0}
+main .grid,main .metric-grid,main .split-fields,main .rm-grid,main .strength-stats,main .power-values,main .day-grid{grid-template-columns:repeat(auto-fit,minmax(0,1fr))}
+main .day-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+main .strength-stats,main .power-values{grid-template-columns:repeat(3,minmax(0,1fr))}
+main :where(p,small,b,strong,span,label,div){overflow-wrap:anywhere}
+main button{min-width:0;max-width:100%;overflow-wrap:anywhere}
+main .plan-choice>div,main .history-content{min-width:0;overflow-wrap:anywhere}
+
 </style></head><body>
 <header><div class="row" style="align-items:center"><div style="flex:1"><div class="brand">HYBRID<span>MELVIN</span></div><div class="tag">KRÜPPELN · POWERN · KILOMETER SCHRUBBEN</div></div><div id="activeProfileBadge" class="pill">Profil</div></div></header>
 <main>
