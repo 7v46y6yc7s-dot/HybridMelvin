@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101114"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon.svg">
+<title>HybridMelvin</title>
+<style>
+:root{--bg:#101114;--panel:#191a20;--panel2:#23252d;--red:#f04452;--red2:#b51e32;--muted:#a1a2aa;--line:#30323b;--white:#f5f5f7}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:92px}
+header{padding:20px 18px 15px;background:linear-gradient(135deg,#28151a,#101114 75%);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:4}
+.brand{font-size:25px;font-weight:950;letter-spacing:-1px}.brand span{color:var(--red)}.tag{font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:3px}
+main{max-width:720px;margin:auto;padding:17px}.eyebrow{color:var(--red);font-weight:850;font-size:10px;letter-spacing:1.7px;text-transform:uppercase}
+h1{font-size:27px;margin:7px 0 5px;letter-spacing:-.6px}h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:0 0 6px}p{color:var(--muted);line-height:1.5;margin:6px 0 12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:15px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{background:var(--panel2);padding:13px;border-radius:13px}.stat strong{display:block;font-size:25px;color:var(--red);margin-top:5px}.stat small{color:var(--muted)}
+button,.btn{border:0;border-radius:12px;background:var(--red);color:white;font-weight:800;padding:12px 15px;font-size:14px;cursor:pointer}
+button.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--white)}button.ghost{background:transparent;border:1px solid var(--line);color:var(--white)}
+button:active{transform:scale(.98)}input,select,textarea{width:100%;background:#111217;color:var(--white);border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;margin:5px 0 11px}label{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-top:7px}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.pill{display:inline-block;background:#351a20;color:#ff7a85;border:1px solid #632a35;padding:5px 9px;border-radius:30px;font-size:11px;font-weight:800}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:5;background:#17181d;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:9px 4px calc(9px + env(safe-area-inset-bottom))}
+nav button{background:transparent;color:var(--muted);padding:8px 5px;font-size:11px;flex:1}nav button.active{color:var(--red);background:#30191e}
+.item{padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.muted{color:var(--muted)}.hidden{display:none!important}.exercise{background:var(--panel2);padding:12px;border-radius:12px;margin:8px 0}
+footer{text-align:center;color:#6f7078;font-size:10px;padding:18px}
+</style></head><body>
+<header><div class="brand">HYBRID<span>MELVIN</span></div><div class="tag">STRENGTH · ENDURANCE · PERFORMANCE</div></header>
+<main>
+<section id="dashboard">
+<div class="eyebrow">Dein Training. Dein Fortschritt.</div><h1>Willkommen zurück.</h1><p>Dein persönliches Cockpit für Krafttraining und Rennrad.</p>
+<div class="grid">
+<div class="stat"><small>Trainings diese Woche</small><strong id="weekCount">0</strong></div>
+<div class="stat"><small>Gespeicherte Einheiten</small><strong id="totalCount">0</strong></div>
+<div class="stat"><small>Kraft-Einheiten</small><strong id="strengthCount">0</strong></div>
+<div class="stat"><small>Radkilometer</small><strong id="kmCount">0</strong></div>
+</div>
+<div class="card"><div class="eyebrow">Schnellstart</div><h2>Was steht heute an?</h2><div class="row"><button onclick="show('log')">＋ Training eintragen</button><button class="secondary" onclick="show('plans')">Pläne ansehen</button></div></div>
+<div class="card"><div class="eyebrow">Dein Hybrid-System</div><h2>Eine Woche, ein Gesamtumfang</h2><p>Bei Hybridplänen zählt die gewählte Zahl als Gesamtzahl aller Trainingstage – Kraft und Radfahren werden darin kombiniert.</p></div>
+<div class="card"><h2>Letzte Aktivitäten</h2><div id="recent" class="muted">Noch keine Einheiten gespeichert.</div></div>
+</section>
+<section id="plans" class="hidden">
+<div class="eyebrow">Plan Builder</div><h1>Dein Trainingsplan</h1><p>Wähle eine Vorlage oder stelle deinen eigenen Plan zusammen.</p>
+<div class="card"><label>Trainingsart</label><select id="planType"><option value="hybrid">Hybrid – Kraft + Rennrad</option><option value="strength">Nur Krafttraining</option><option value="bike">Nur Rennrad</option><option value="custom">Individueller Plan</option></select>
+<label>Trainingstage pro Woche (gesamt)</label><select id="days"><option>3</option><option selected>4</option><option>5</option><option>6</option></select>
+<div id="splitHint" class="muted">Empfehlung: 2 Krafttage + 2 Radeinheiten. Alle Tage zusammen ergeben 4.</div>
+<label>Planname</label><input id="planName" value="Mein Hybridplan" maxlength="40">
+<button onclick="makePlan()">Plan erstellen</button></div>
+<div id="planOutput"></div>
+<div class="card"><div class="eyebrow">Deine Pläne</div><div id="savedPlans" class="muted">Noch keine eigenen Pläne.</div></div>
+</section>
+<section id="log" class="hidden">
+<div class="eyebrow">Trainingstagebuch</div><h1>Einheit erfassen</h1><div class="card">
+<label>Trainingsart</label><select id="logType" onchange="toggleLog()"><option value="strength">Krafttraining</option><option value="bike">Rennrad</option></select>
+<label>Datum</label><input id="logDate" type="date">
+<div id="strengthFields"><label>Training / Split</label><input id="workout" placeholder="z. B. Oberkörper, Beine, Ganzkörper"><label>Übungen und Notizen</label><textarea id="notes" rows="3" placeholder="z. B. Kniebeugen 3×5 @ 100 kg"></textarea></div>
+<div id="bikeFields" class="hidden"><label>Distanz (km)</label><input id="distance" type="number" min="0" step=".1" placeholder="z. B. 65"><label>Fahrzeit (Minuten)</label><input id="duration" type="number" min="0" placeholder="z. B. 150"><label>Notizen</label><textarea id="rideNotes" rows="2" placeholder="Route, Gefühl, Höhenmeter …"></textarea></div>
+<button onclick="saveLog()">Einheit speichern</button></div>
+</section>
+<section id="history" class="hidden"><div class="eyebrow">Deine Daten</div><h1>Verlauf</h1><div id="historyList" class="card muted">Noch keine Einheiten gespeichert.</div><button class="secondary" onclick="exportData()">Daten exportieren</button> <button class="ghost" onclick="clearData()">Alle Daten löschen</button><p>Deine Einträge werden lokal auf diesem Gerät gespeichert.</p></section>
+<section id="profile" class="hidden"><div class="eyebrow">Einstellungen</div><h1>Profil</h1><div class="card"><label>Dein Name</label><input id="athleteName" placeholder="Name"><label>Körpergewicht (kg)</label><input id="bodyWeight" type="number" placeholder="z. B. 90"><label>Trainingsziel</label><textarea id="goal" rows="3" placeholder="z. B. stärker werden und 150 km Rad fahren"></textarea><button onclick="saveProfile()">Profil speichern</button></div><div class="card"><h2>HybridMelvin</h2><p>Version 0.1 · Erste funktionsfähige Basis</p></div></section>
+</main>
+<nav><button class="active" data-tab="dashboard" onclick="show('dashboard')">⌂<br>Start</button><button data-tab="plans" onclick="show('plans')">▤<br>Pläne</button><button data-tab="log" onclick="show('log')">＋<br>Eintragen</button><button data-tab="history" onclick="show('history')">◷<br>Verlauf</button><button data-tab="profile" onclick="show('profile')">◎<br>Profil</button></nav>
+<script>
+const $=id=>document.getElementById(id);
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+let logs=load('hm_logs',[]),plans=load('hm_plans',[]),profile=load('hm_profile',{});
+function persist(){localStorage.setItem('hm_logs',JSON.stringify(logs));localStorage.setItem('hm_plans',JSON.stringify(plans))}
+function show(id){document.querySelectorAll('main section').forEach(s=>s.classList.toggle('hidden',s.id!==id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));if(id==='dashboard')refresh();if(id==='history')renderHistory();if(id==='plans')renderPlans()}
+function refresh(){let week=new Date();let monday=new Date(week);monday.setDate(week.getDate()-((week.getDay()+6)%7));monday.setHours(0,0,0,0);$('weekCount').textContent=logs.filter(x=>new Date(x.date+'T00:00:00')>=monday).length;$('totalCount').textContent=logs.length;$('strengthCount').textContent=logs.filter(x=>x.type==='strength').length;$('kmCount').textContent=logs.reduce((a,x)=>a+(Number(x.distance)||0),0).toFixed(1);$('recent').innerHTML=logs.length?logs.slice(-3).reverse().map(logLine).join(''):'Noch keine Einheiten gespeichert.'}
+function logLine(x){return '<div class="item"><b>'+esc(x.type==='bike'?'🚴 Rennrad':'🏋️ Krafttraining')+'</b> · '+esc(x.date)+'<br><span class="muted">'+esc(x.summary||'')+'</span></div>'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toggleLog(){let bike=$('logType').value==='bike';$('bikeFields').classList.toggle('hidden',!bike);$('strengthFields').classList.toggle('hidden',bike)}
+function saveLog(){let type=$('logType').value,date=$('logDate').value||new Date().toISOString().slice(0,10);let summary;if(type==='bike'){let distance=Number($('distance').value)||0;summary=distance+' km · '+($('duration').value||0)+' min · '+$('rideNotes').value;logs.push({type,date,distance,summary})}else{summary=$('workout').value+' · '+$('notes').value;logs.push({type,date,summary})}persist();$('workout').value=$('notes').value=$('distance').value=$('duration').value=$('rideNotes').value='';alert('Einheit gespeichert!');show('dashboard')}
+function makePlan(){let type=$('planType').value,days=Number($('days').value),name=$('planName').value||'Mein Plan';let schedule=[];if(type==='hybrid'){let strength=days===3?2:Math.ceil(days/2),bike=days-strength;schedule=Array.from({length:days},(_,i)=>i%2===0?'Krafttraining':'Rennrad');if(days===3)schedule=['Krafttraining','Rennrad','Krafttraining'];if(days===5)schedule=['Krafttraining','Rennrad','Krafttraining','Rennrad','Krafttraining']}else{let label=type==='strength'?'Krafttraining':type==='bike'?'Rennrad':'Individuell';schedule=Array(days).fill(label)}
+let p={name,type,days,schedule,created:new Date().toISOString()};plans.push(p);localStorage.setItem('hm_plans',JSON.stringify(plans));$('planOutput').innerHTML='<div class="card"><span class="pill">PLAN ERSTELLT</span><h2>'+esc(name)+'</h2><p>'+days+' Trainingstage insgesamt</p>'+schedule.map((v,i)=>'<div class="item"><b>Tag '+(i+1)+'</b> · '+esc(v)+'</div>').join('')+'<p>Dies ist eine Startverteilung. Du kannst sie im nächsten Ausbauschritt individuell bearbeiten.</p></div>';renderPlans()}
+function renderPlans(){$('savedPlans').innerHTML=plans.length?plans.map(p=>'<div class="item"><b>'+esc(p.name)+'</b><br><span class="muted">'+p.days+' Tage · '+esc(p.type)+'</span></div>').join(''):'Noch keine eigenen Pläne.'}
+function renderHistory(){$('historyList').innerHTML=logs.length?logs.slice().reverse().map(logLine).join(''):'Noch keine Einheiten gespeichert.'}
+function clearData(){if(confirm('Wirklich alle Trainingsdaten und Pläne auf diesem Gerät löschen?')){logs=[];plans=[];persist();refresh();renderHistory();renderPlans()}}
+function exportData(){let blob=new Blob([JSON.stringify({logs,plans,profile},null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hybridmelvin-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function saveProfile(){profile={name:$('athleteName').value,weight:$('bodyWeight').value,goal:$('goal').value};localStorage.setItem('hm_profile',JSON.stringify(profile));alert('Profil gespeichert.')}
+$('planType').addEventListener('change',()=>{let t=$('planType').value,d=Number($('days').value);$('splitHint').textContent=t==='hybrid'?'Empfehlung: '+(d===3?'2 Krafttage + 1 Radeinheit':d===4?'2 Krafttage + 2 Radeinheiten':d===5?'3 Krafttage + 2 Radeinheiten':'3 Krafttage + 3 Radeinheiten')+'. Alle Tage zusammen ergeben '+d+'.':t==='strength'?'Alle '+d+' Tage sind Krafttraining.':t==='bike'?'Alle '+d+' Tage sind Radeinheiten.':'Du legst die Inhalte individuell fest.'});
+$('days').addEventListener('change',()=>$('planType').dispatchEvent(new Event('change')));
+$('logDate').value=new Date().toISOString().slice(0,10);$('athleteName').value=profile.name||'';$('bodyWeight').value=profile.weight||'';$('goal').value=profile.goal||'';refresh();renderPlans();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script></body></html>
