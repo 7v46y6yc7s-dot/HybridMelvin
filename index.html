@@ -100,6 +100,47 @@ img,svg,video,canvas{max-width:100%}
   .day-square{min-width:0;padding:6px 1px;font-size:10px}
   nav button{min-width:0;padding-left:2px;padding-right:2px;font-size:9px}
 }
+
+/* ZENTRIERTES LAYOUT UND RESPONSIVE IPHONE-BREITE */
+html,body{width:100%;max-width:100%;overflow-x:clip}
+body{text-align:center}
+header .row{position:relative;justify-content:center}
+header .row>div:first-child{flex:1 1 100%;min-width:0;text-align:center}
+header .row>#activeProfileBadge{position:absolute;right:0;top:50%;transform:translateY(-50%);max-width:86px}
+main{width:100%;margin-left:auto;margin-right:auto}
+main>section{width:100%;min-width:0;margin-left:auto;margin-right:auto}
+main .card,main .week-block,main .week-fold{margin-left:auto;margin-right:auto}
+main .card>*{max-width:100%;min-width:0}
+main h1,main h2,main h3,main p,main label,main .muted,main .eyebrow{text-align:center}
+main input,main select,main textarea{text-align:center;max-width:100%;min-width:0}
+main button{max-width:100%;white-space:normal}
+main .row{justify-content:center;align-items:center}
+main .row>*{min-width:0;max-width:100%}
+main .profile-actions{justify-content:center}
+main .plan-choice{min-width:0}
+main .plan-choice>div{min-width:0;overflow-wrap:anywhere;text-align:center}
+main .week-title{justify-content:center;gap:10px;flex-wrap:wrap;text-align:center}
+main .day-detail,main .exercise,main .block-rm{text-align:center;min-width:0;max-width:100%}
+main .exercise .row{justify-content:center}
+main .exercise .row>*{min-width:0}
+main .history-item{justify-content:center;text-align:center}
+main .history-content{text-align:center;min-width:0;overflow-wrap:anywhere}
+main .grid,main .metric-grid,main .power-values,main .strength-stats,main .day-grid,main .rm-grid,main .split-fields{width:100%;min-width:0}
+main .stat,main .power-value,main .day-square{min-width:0;overflow-wrap:anywhere}
+footer{text-align:center}
+@media(max-width:430px){
+  main{padding-left:10px;padding-right:10px}
+  header{padding-left:12px;padding-right:12px}
+  header .brand{font-size:21px}
+  header .tag{font-size:6.5px;letter-spacing:.35px}
+  header .row>#activeProfileBadge{max-width:70px;font-size:8px;padding:4px 5px}
+  main .card{padding:13px 10px}
+  main .row{gap:7px}
+  main .row>*{flex:1 1 0}
+  main .profile-actions button{flex:1 1 0}
+  main .history-item{flex-wrap:wrap}
+}
+
 </style></head><body>
 <header><div class="row" style="align-items:center"><div style="flex:1"><div class="brand">HYBRID<span>MELVIN</span></div><div class="tag">KRÜPPELN · POWERN · KILOMETER SCHRUBBEN</div></div><div id="activeProfileBadge" class="pill">Profil</div></div></header>
 <main>
