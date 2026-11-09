@@ -192,6 +192,8 @@ body{overscroll-behavior-x:none}
 .weight-recommend{color:#ff8799!important;font-weight:900;font-size:15px;letter-spacing:.1px;margin:5px 0 8px}
 .home-art figcaption{white-space:nowrap;font-size:clamp(7px,2vw,9px);letter-spacing:.35px;padding:9px 4px}
 
+
+input.weight-entry::placeholder{color:#ff8799;opacity:1;font-weight:900;font-size:13px}
 </style></head><body>
 <header><div class="row" style="align-items:center"><div style="flex:1"><div class="brand">HYBRID<span>MELVIN</span></div><div class="tag">KRÜPPELN · POWERN · KILOMETER SCHRUBBEN</div></div><div id="activeProfileBadge" class="pill">Profil</div></div></header>
 <main>
@@ -321,10 +323,7 @@ let opts=exerciseOptions(ex.name),bikeInStrength=structured&&isBikeExercise(ex.n
 out+='<div class="exercise">'+(editable?'<label>Übung '+(j+1)+'</label><select id="ex-'+key+'-'+j+'">'+opts.map(name=>'<option value="'+esc(name)+'" '+(name===ex.name?'selected':'')+'>'+esc(name)+'</option>').join('')+'</select>':'<b>'+esc(ex.name)+'</b>');
 if(structured&&!bikeInStrength)out+='<div class="training-metrics"><div><small class="muted">SÄTZE</small><b>'+sets+'</b></div><div><small class="muted">WDH.</small><b>'+reps+'</b></div><div><small class="muted">RPE</small><b>'+rpe+'</b></div></div>';
 else if(!bikeInStrength)out+='<div class="muted">'+esc(ex.sets)+'</div>';
-if(bikeInStrength){out+='<label>Fahrzeit (Minuten)</label><input id="minutes-'+key+'-'+j+'" type="number" min="1" step="1" placeholder="z. B. 30"><div class="recommend">Empfehlung: 20–40 Minuten</div>';}else{out+='<label>Dein Gewicht (kg)</label>';}
-if(!bikeInStrength&&rec&&rec.value!==null)out+='<div class="recommend weight-recommend">Empfehlung: '+rec.value+' kg</div>';
-else if(!bikeInStrength&&rec&&rec.needsBase&&week>1)out+='<div class="recommend weight-recommend">Ausgangsgewicht aus Woche 1 fehlt noch</div>';
-else if(!bikeInStrength&&structured&&isCoreLift(ex.name)&&rec&&rec.value===null)out+='<div class="recommend weight-recommend">1RM-Grundlage fehlt</div>';
+if(bikeInStrength){out+='<label>Fahrzeit (Minuten)</label><input id="minutes-'+key+'-'+j+'" type="number" min="1" step="1" placeholder="z. B. 30"><div class="recommend">Empfehlung: 20–40 Minuten</div>';}else{let weightHint=rec&&rec.value!==null?'Empfehlung: '+rec.value+' kg':(rec&&rec.needsBase&&week>1?'Ausgangsgewicht aus Woche 1':(structured&&isCoreLift(ex.name)&&rec&&rec.value===null?'1RM-Grundlage fehlt':'Ausgangsgewicht in kg'));out+='<label>Dein Gewicht (kg)</label><input class="weight-entry" id="weight-'+key+'-'+j+'" type="number" min="0" step="0.5" placeholder="'+weightHint+'">';}
 out+='</div>';
 });
 out+='<label>Notizen (optional)</label><textarea id="note-'+key+'" rows="2" placeholder="Wie lief das Training?"></textarea><div class="row"><button type="button" onclick="completeDay('+key+',\'strength\')">Abschließen ✓</button><button type="button" class="secondary" onclick="skipDay('+key+')">Tag ausfallen lassen</button></div>';
