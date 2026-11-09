@@ -167,15 +167,11 @@ main .plan-choice>div,main .history-content{min-width:0;overflow-wrap:anywhere}
 
 
 /* HYBRIDMELVIN ARTWORK + 2-SECOND OPENING SPLASH */
-#hmSplash{position:fixed;inset:0;z-index:9999;background:#050609;display:flex;align-items:center;justify-content:center;padding:18px;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease}
-#hmSplash img{display:block;width:100%;max-width:520px;max-height:92dvh;object-fit:contain;border-radius:8px}
-#hmSplash.hide{opacity:0;visibility:hidden;pointer-events:none}
 .home-art{margin:18px 0 8px;padding:0;overflow:hidden;border:1px solid #383943;border-radius:14px;background:#08090c}
 .home-art img{display:block;width:100%;height:auto;max-height:560px;object-fit:contain}
 .home-art figcaption{padding:9px 12px;color:#a7a8b0;font-size:9px;letter-spacing:1.3px;font-weight:850;text-align:center}
 
 </style></head><body>
-<div id="hmSplash" aria-label="HybridMelvin"><img src="hybridmelvin-art.jpg" alt="HybridMelvin Krafttraining und Rennrad"></div>
 <header><div class="row" style="align-items:center"><div style="flex:1"><div class="brand">HYBRID<span>MELVIN</span></div><div class="tag">KRÜPPELN · POWERN · KILOMETER SCHRUBBEN</div></div><div id="activeProfileBadge" class="pill">Profil</div></div></header>
 <main>
 <section id="dashboard">
@@ -323,6 +319,5 @@ function deleteProfile(){if(profiles.length<=1){alert('Mindestens ein Profil mus
 function saveProfile(){let newWeight=$('bodyWeight').value,oldWeight=Number(profile.weight)||0,weight=Number(newWeight)||0;profile.name=$('athleteName').value.trim()||'Mein Profil';profile.goal=$('goal').value;profile.weight=newWeight;profile.weightHistory=profile.weightHistory||[];if(weight>0&&weight!==oldWeight)profile.weightHistory.push({weight,date:new Date().toISOString().slice(0,10)});activeProfile=profile;save();renderProfiles();refresh();alert('Profil gespeichert.')}
 function updatePlanForm(){let t=$('planType').value,d=Number($('days').value);$('rmFields').classList.toggle('hidden',t==='bike');$('splitFields').classList.toggle('hidden',t!=='hybrid');$('singleHint').textContent=t==='hybrid'?'':(t==='strength'?'Alle '+d+' Tage: Krafttraining.':'Alle '+d+' Tage: Rennrad/Gravel.');if(t==='hybrid'){let b=Math.round(d*.66),st=d-b;$('bikeDays').innerHTML=Array.from({length:d+1},(_,i)=>'<option value="'+i+'" '+(i===b?'selected':'')+'>'+i+'</option>').join('');$('strengthDays').innerHTML=Array.from({length:d+1},(_,i)=>'<option value="'+i+'" '+(i===st?'selected':'')+'>'+i+'</option>').join('');$('splitHint').textContent='Empfohlene Aufteilung: '+b+' Rad-/Graveltage und '+st+' Krafttage.';let update=()=>{$('splitAdvice').textContent='Ausgewählt: '+$('bikeDays').value+' Rad-/Graveltage + '+$('strengthDays').value+' Krafttage '+(Number($('bikeDays').value)+Number($('strengthDays').value)===d?'✓':'– Summe stimmt noch nicht')};$('bikeDays').onchange=update;$('strengthDays').onchange=update;update()}}
 $('planType').addEventListener('change',updatePlanForm);$('days').addEventListener('change',updatePlanForm);renderProfiles();updatePlanForm();refresh();renderPlan();
-setTimeout(()=>{let splash=$('hmSplash');if(splash){splash.classList.add('hide');setTimeout(()=>splash.remove(),350)}},2000);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script></body></html>
