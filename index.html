@@ -158,6 +158,13 @@ main :where(p,small,b,strong,span,label,div){overflow-wrap:anywhere}
 main button{min-width:0;max-width:100%;overflow-wrap:anywhere}
 main .plan-choice>div,main .history-content{min-width:0;overflow-wrap:anywhere}
 
+/* Kompakte Trainingswerte: drei feste Spalten ohne horizontales Scrollen */
+.exercise .training-metrics{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px!important;width:100%;max-width:100%;align-items:center;margin:10px 0}
+.exercise .training-metrics>div{min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}
+.exercise .training-metrics small{font-size:10px;line-height:1.1;letter-spacing:.3px;white-space:nowrap}
+.exercise .training-metrics b{font-size:16px;line-height:1.2;white-space:nowrap}
+@media(max-width:390px){.exercise .training-metrics{gap:3px!important}.exercise .training-metrics small{font-size:9px;letter-spacing:0}.exercise .training-metrics b{font-size:15px}}
+
 </style></head><body>
 <header><div class="row" style="align-items:center"><div style="flex:1"><div class="brand">HYBRID<span>MELVIN</span></div><div class="tag">KRÜPPELN · POWERN · KILOMETER SCHRUBBEN</div></div><div id="activeProfileBadge" class="pill">Profil</div></div></header>
 <main>
@@ -249,7 +256,7 @@ if(!Array.isArray(day.exercises))day.exercises=[];
 day.exercises.forEach((ex,j)=>{
 let opts=exerciseOptions(ex.name),rec=exerciseRecommendation(ex.name,week,ex.sets),sets=parseSets(ex.sets),reps=structured?weekReps(ex.name,week,sets):((String(ex.sets).match(/x\s*(\d+)/i)||[])[1]||'–'),rpe=structured?weekRPE(week):'–';
 out+='<div class="exercise">'+(editable?'<label>Übung '+(j+1)+'</label><select id="ex-'+key+'-'+j+'">'+opts.map(name=>'<option value="'+esc(name)+'" '+(name===ex.name?'selected':'')+'>'+esc(name)+'</option>').join('')+'</select>':'<b>'+esc(ex.name)+'</b>');
-if(structured)out+='<div class="row" style="gap:5px"><div><small class="muted">Sätze</small><b>'+sets+'</b></div><div><small class="muted">Wiederholungen</small><b>'+reps+'</b></div><div><small class="muted">RPE</small><b>'+rpe+'</b></div></div>';
+if(structured)out+='<div class="training-metrics"><div><small class="muted">SÄTZE</small><b>'+sets+'</b></div><div><small class="muted">WDH.</small><b>'+reps+'</b></div><div><small class="muted">RPE</small><b>'+rpe+'</b></div></div>';
 else out+='<div class="muted">'+esc(ex.sets)+'</div>';
 out+='<label>Dein Gewicht (kg)</label><input id="weight-'+key+'-'+j+'" type="number" min="0" step="0.5" placeholder="z. B. 80">';
 if(rec&&rec.value!==null)out+='<div class="recommend">Empfehlung: '+rec.value+' kg · '+rec.reps+' Wdh. · RPE '+rec.rpe+'</div>';
