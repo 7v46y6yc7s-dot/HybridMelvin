@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"><rect width="512" height="512" rx="96" fill="#050609"/><image xlink:href="hybridmelvin-art.jpg" href="hybridmelvin-art.jpg" x="0" y="-25" width="512" height="562" preserveAspectRatio="xMidYMid slice"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="104" fill="#050609"/>
+<path d="M83 365 130 120h82l45 151 44-151h82l47 245h-83l-22-140-43 140h-55l-43-140-20 140z" fill="#c8102e"/>
+<path d="M171 98h54v126h62V98h54v316h-54V276h-62v138h-54z" fill="#f5f5f7"/>
+</svg>
