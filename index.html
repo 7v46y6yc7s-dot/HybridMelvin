@@ -171,6 +171,17 @@ main .plan-choice>div,main .history-content{min-width:0;overflow-wrap:anywhere}
 .home-art img{display:block;width:min(100%,150px);height:auto;max-height:none;object-fit:contain;margin:0 auto}
 .home-art figcaption{padding:9px 12px;color:#a7a8b0;font-size:9px;letter-spacing:1.3px;font-weight:850;text-align:center}
 
+
+.rm-estimate{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.rm-estimate>div{min-width:0;display:flex;flex-direction:column;gap:3px}
+.rm-estimate small{font-size:10px;line-height:1.3}
+.rm-estimate strong{font-size:19px;white-space:nowrap;color:#ff8799}
+.block-rating{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.block-rating .rating-option{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:12px 5px;background:#17181e;border:1px solid var(--line);border-radius:12px}
+.block-rating .rating-option span{font-size:25px;font-weight:900}
+.block-rating .rating-option small{font-size:10px;color:var(--muted)}
+.block-rating .good{border-color:#367b56}.block-rating .neutral{border-color:#777}.block-rating .hard{border-color:#9b3046}
+
 </style></head><body>
 <header><div class="row" style="align-items:center"><div style="flex:1"><div class="brand">HYBRID<span>MELVIN</span></div><div class="tag">KRÜPPELN · POWERN · KILOMETER SCHRUBBEN</div></div><div id="activeProfileBadge" class="pill">Profil</div></div></header>
 <main>
@@ -210,6 +221,7 @@ function line(x,index){return '<div class="item history-item"><div class="histor
 function trainingRankMarkup(total){if(total<1)return '';if(total<=10)return '<span class="rank-badge noob">NOOB</span>';if(total<=50)return '<span class="rank-badge beginner">BEGINNER</span>';if(total<=100)return '<span class="rank-badge advanced">FORTGESCHRITTEN</span>';if(total<=150)return '<span class="rank-badge pro">PROFI</span>';let tier=total<200?'bronze':total<300?'silver':'gold',label=tier.toUpperCase(),color=tier==='bronze'?'#cd8b58':tier==='silver'?'#c9cdd5':'#e6bd52';return '<span class="laurel-badge '+tier+'"><svg viewBox="0 0 40 42" aria-hidden="true"><path d="M13 36C3 26 4 12 13 4M27 36C37 26 36 12 27 4" fill="none" stroke="'+color+'" stroke-width="2.1" stroke-linecap="round"/><g fill="'+color+'"><ellipse cx="8" cy="29" rx="3" ry="5" transform="rotate(-48 8 29)"/><ellipse cx="6" cy="21" rx="3" ry="5" transform="rotate(-30 6 21)"/><ellipse cx="7" cy="13" rx="3" ry="5" transform="rotate(-12 7 13)"/><ellipse cx="12" cy="7" rx="3" ry="5" transform="rotate(28 12 7)"/><ellipse cx="32" cy="29" rx="3" ry="5" transform="rotate(48 32 29)"/><ellipse cx="34" cy="21" rx="3" ry="5" transform="rotate(30 34 21)"/><ellipse cx="33" cy="13" rx="3" ry="5" transform="rotate(12 33 13)"/><ellipse cx="28" cy="7" rx="3" ry="5" transform="rotate(-28 28 7)"/></g><path d="M13 37Q20 41 27 37" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round"/></svg><span>'+label+'</span></span>'}
 function refresh(){$('totalTrainings').textContent=logs.length;$('trainingRank').innerHTML=trainingRankMarkup(logs.length);$('strengthCount').textContent=logs.filter(x=>x.type==='strength').length;$('kmCount').textContent=logs.reduce((a,x)=>a+(Number(x.distance)||0),0).toFixed(1);let rm=activePlan?.oneRM||{};['squat','bench','deadlift'].forEach((key)=>{let el=$('dash'+({squat:'Squat',bench:'Bench',deadlift:'Deadlift'}[key]));let blocks=(activePlan?.oneRMBlocks||[]).filter(Boolean);let previous=blocks.length>1?blocks[blocks.length-2]:null;let value=rm[key];let arrow='';if(previous&&Number(value)>0&&Number(previous[key])>0&&Number(value)!==Number(previous[key])){let up=Number(value)>Number(previous[key]);arrow='<span style="font-size:17px;color:'+(up?'#63d68b':'#f04452')+';margin-left:6px;font-weight:900">'+(up?'↑':'↓')+'</span>'}el.innerHTML=value?esc(value)+' kg '+arrow:'–'});let hist=profile.weightHistory||[],cur=Number(profile.weight)||0,prev=hist.length>1?Number(hist[hist.length-2].weight):0;$('dashWeight').textContent=cur?cur.toFixed(1)+' kg':'– kg';$('weightTrend').textContent=cur&&prev?(cur<prev?'↓':'↑'):'—';$('weightTrend').style.color=cur&&prev?(cur<prev?'#63d68b':'#ed4057'):'#b0b2bb';$('weightGoal').textContent=({strength:'💪 Kraftaufbau',diet:'🥗 Diät',endurance:'🚴 Ausdauer'}[profile.goal]||'Ziel auswählen')+' · '+(activeProfile.name||'Profil');$('activeProfileBadge').textContent=activeProfile.name||'Profil'}
 
+const ONE_RM_REP_TABLE={1:100,2:95,3:90,4:88,5:86,6:83,7:80,8:78,9:76,10:75};
 const RPE_TABLE={
 10:[100,95.5,92.2,89.2,86.3,83.7,81.1,78.6,76.2,73.9,70.7,68],
 9:[95.5,92.2,89.2,86.3,83.7,81.1,78.6,76.2,73.9,70.7,68,65.3],
@@ -249,7 +261,42 @@ function selectPlan(id){let p=plans.find(x=>x.id===id);if(!p)return;activePlan=p
 function renderPlan(){renderPlanChoices();let root=$('activePlan');if(!root)return;if(!activePlan){root.innerHTML='Noch kein Plan erstellt. Erstelle ihn unter „Eintragen“.';return}ensurePlan();let total=(activePlan.totalWeeks||activePlan.blockCount*5||15)*activePlan.days,done=activePlan.completed.length,skipped=activePlan.skipped.length,out='<div class="card"><span class="pill">AKTUELLER PLAN</span><h2>'+esc(activePlan.name)+'</h2><p>'+done+' erledigt · '+skipped+' ausgefallen · '+(total-done-skipped)+' offen von '+total+'</p><div class="stat"><small>Abgeschlossene Einheiten</small><strong>'+Math.round(done/total*100)+' %</strong></div><div class="row"><button type="button" class="secondary" onclick="resetPlan()">Fortschritt zurücksetzen</button><button type="button" class="plan-delete" onclick="deletePlan()">Plan löschen</button></div></div>';let currentWeek=1;for(let w=1;w<=(activePlan.totalWeeks||activePlan.blockCount*5||15);w++){let pending=activePlan.dayTemplates.some((_,d)=>{let k=(w-1)*activePlan.days+d;return !activePlan.completed.some(x=>x.key===k)&&!activePlan.skipped.some(x=>x.key===k)});if(pending){currentWeek=w;break}}for(let block=0;block<(activePlan.blockCount||3);block++){out+='<div class="week-block"><div class="card"><div class="week-title"><h2>Block '+(block+1)+'</h2><span class="muted">Wochen '+(block*5+1)+'–'+(block*5+5)+'</span></div>';for(let w=1;w<=5;w++){let week=block*5+w,weekSelected=selectedDayKey!==null&&Math.floor(selectedDayKey/activePlan.days)+1===week;out+='<details class="week-fold" '+(week===currentWeek||weekSelected||selectedRMWeek===week?'open':'')+'><summary>Woche '+week+(w===5?' <span class="deload">· DELOAD</span>':'')+' <span class="muted">'+activePlan.days+' Tage</span></summary><div class="day-grid">';activePlan.dayTemplates.forEach((day,d)=>{let key=(week-1)*activePlan.days+d,e=activePlan.completed.find(z=>z.key===key),skip=activePlan.skipped.find(z=>z.key===key);out+='<button type="button" class="day-square '+(e?'done':skip?'skipped':'')+' '+(selectedDayKey===key?'selected':'')+'" onclick="openDay('+key+')">'+(e?'✓':skip?'↷':'·')+' TAG '+(d+1)+'<br><small>'+(day.kind==='Krafttraining'?'💪':'🚴')+'</small></button>'});if(w===5&&block<(activePlan.blockCount||3)-1&&activePlan.type!=='bike')out+='<button type="button" class="day-square rm-square '+(selectedRMWeek===week?'selected':'')+'" onclick="openRMCheck('+week+')">1RM<br><small>CHECK</small></button>';out+='</div>';if(weekSelected&&selectedRMWeek!==week)out+=renderDayDetail(week,selectedDayKey);else if(selectedRMWeek===week&&w===5&&block<(activePlan.blockCount||3)-1&&activePlan.type!=='bike')out+=renderRMCheck(week);else out+='<div class="muted week-hint">Wähle einen Tag oder – in der Deload-Woche – den 1RM-Check.</div>';out+='</details>'}out+='</div></div>'}root.innerHTML=out}
 function openDay(key){selectedDayKey=key;selectedRMWeek=null;renderPlan()}
 function openRMCheck(week){selectedDayKey=null;selectedRMWeek=week;renderPlan()}
-function renderRMCheck(week){let current=activePlan.oneRMBlocks?.[Math.floor((week-1)/5)]||activePlan.oneRM||{};return '<div class="day-detail block-rm"><div class="week-title"><b>1RM-Check · nach Woche '+week+'</b><span class="pill">NEUER BLOCK</span></div><p class="muted">Trage deine aktuellen Maximalwerte ein. Sie werden als Grundlage für den nächsten Block verwendet.</p><div class="rm-grid"><div><label>Kniebeugen (kg)</label><input id="blockRmSquat-'+week+'" type="number" min="1" step="0.5" value="'+(current.squat||'')+'" placeholder="z. B. 140"></div><div><label>Bankdrücken (kg)</label><input id="blockRmBench-'+week+'" type="number" min="1" step="0.5" value="'+(current.bench||'')+'" placeholder="z. B. 100"></div><div><label>Kreuzheben (kg)</label><input id="blockRmDeadlift-'+week+'" type="number" min="1" step="0.5" value="'+(current.deadlift||'')+'" placeholder="z. B. 180"></div></div><button type="button" onclick="saveBlockRM('+week+')">1RM-Werte speichern</button></div>'}
+function estimateBlock1RM(week,lift){
+let testWeek=week-1,repCount=weekReps(lift,testWeek),rpe=weekRPE(testWeek),effectiveReps=Math.min(10,repCount+(10-rpe));
+let pct=ONE_RM_REP_TABLE[effectiveReps]||null,dayKeys=[];
+for(let d=0;d<activePlan.days;d++){let key=(testWeek-1)*activePlan.days+d;if(activePlan.dayTemplates[d]?.kind==='Krafttraining')dayKeys.push(key)}
+for(let key of dayKeys){
+ let done=activePlan.completed.find(x=>x.key===key);if(!done)continue;
+ let exercises=done.exercises||[];
+ let found=exercises.find(x=>x.name===lift&&Number(x.weight)>0);
+ if(!found){let entry=logs.find(x=>x.summary?.startsWith('Woche '+testWeek+', Tag '+(key%activePlan.days+1)+':')&&x.exercises?.some(z=>z.name===lift&&Number(z.weight)>0));found=entry?.exercises?.find(z=>z.name===lift&&Number(z.weight)>0)}
+ if(found&&pct)return {value:Math.round((Number(found.weight)/(pct/100))*2)/2,weight:Number(found.weight),reps:repCount,rpe,effectiveReps,pct};
+}
+return null;
+}
+function renderRMCheck(week){
+let block=Math.floor((week-1)/5),current=activePlan.oneRMBlocks?.[block]||activePlan.oneRM||{};
+let estimates={squat:estimateBlock1RM(week,'Kniebeuge'),bench:estimateBlock1RM(week,'Bankdrücken'),deadlift:estimateBlock1RM(week,'Kreuzheben')};
+let labels={squat:'Kniebeuge',bench:'Bankdrücken',deadlift:'Kreuzheben'};
+let rows=Object.keys(labels).map(k=>{let e=estimates[k];return '<div class="rm-estimate"><div><b>'+labels[k]+'</b><small class="muted">'+(e?e.weight+' kg · '+e.reps+' Wdh. · RPE '+e.rpe+' · '+e.pct+' %':'Kein passender Trainingswert gefunden')+'</small></div><strong>'+(e?e.value+' kg':'–')+'</strong></div>'}).join('');
+return '<div class="day-detail block-rm"><div class="week-title"><b>1RM-Check · nach Woche '+week+'</b><span class="pill">BLOCKBEWERTUNG</span></div><p class="muted">Geschätztes 1RM aus dem letzten Belastungstraining (Woche '+(week-1)+', ohne Deload). Die RPE wird in Wiederholungen in Reserve umgerechnet und mit deiner Prozenttabelle verrechnet.</p>'+rows+'<p class="muted">Wie war der Block insgesamt?</p><div class="block-rating"><button type="button" class="rating-option good" onclick="saveBlockRating('+week+',\'good\')"><span>:-)</span><small>Gut</small></button><button type="button" class="rating-option neutral" onclick="saveBlockRating('+week+',\'neutral\')"><span>:-|</span><small>Passt</small></button><button type="button" class="rating-option hard" onclick="saveBlockRating('+week+',\'hard\')"><span>:-(</span><small>Zu schwer</small></button></div><p class="muted">Gut: geschätztes 1RM übernehmen · Neutral: bisheriges 1RM behalten · Zu schwer: bisheriges 1RM um 5 % senken.</p></div>';
+}
+function saveBlockRating(week,rating){
+let block=Math.floor((week-1)/5),nextBlock=block+1,current=activePlan.oneRMBlocks?.[block]||activePlan.oneRM||{};
+let estimates={squat:estimateBlock1RM(week,'Kniebeuge'),bench:estimateBlock1RM(week,'Bankdrücken'),deadlift:estimateBlock1RM(week,'Kreuzheben')};
+let vals={};
+for(let key of ['squat','bench','deadlift']){
+ let base=Number(current[key])||0,estimate=estimates[key]?.value;
+ if(rating==='good'&&estimate)vals[key]=estimate;
+ else if(rating==='hard')vals[key]=Math.round(base*.95*2)/2;
+ else vals[key]=base;
+}
+if(Object.values(vals).some(v=>!(v>0))){alert('Für die Berechnung fehlen noch Ausgangswerte oder Trainingsgewichte. Bitte prüfe die drei Grundübungen in Woche '+(week-1)+'.');return}
+activePlan.blockRatings=activePlan.blockRatings||{};activePlan.blockRatings[block]=rating;
+activePlan.oneRMBlocks=activePlan.oneRMBlocks||[];activePlan.oneRMBlocks[nextBlock]=vals;activePlan.oneRM=vals;
+save();renderPlan();refresh();
+alert(rating==='good'?'Starker Block! Die errechneten 1RM-Werte gelten als Grundlage für den nächsten Block.':rating==='neutral'?'Blockbewertung gespeichert. Die 1RM-Werte bleiben unverändert.':'Blockbewertung gespeichert. Die 1RM-Werte wurden für den nächsten Block um 5 % reduziert.');
+}
 function renderDayDetail(week,key){
 let d=key%activePlan.days,day=activePlan.dayTemplates[d],e=activePlan.completed.find(z=>z.key===key),skip=activePlan.skipped.find(z=>z.key===key),structured=activePlan.type==='strength';
 let out='<div class="day-detail"><div class="week-title"><b>'+(day.kind==='Krafttraining'?'💪':'🚴')+' Tag '+(d+1)+' · '+esc(day.kind==='Rennrad'?'Rennrad/Gravel':day.kind)+'</b>'+(e?'<span class="done-tag">✓ ERLEDIGT</span>':skip?'<span class="deload">↷ AUSGEFALLEN</span>':'<span class="pill">'+(week%5===0?'DELOAD':'OFFEN')+'</span>')+'</div>';
@@ -276,7 +323,7 @@ out+='<label>Gefahrene Kilometer</label><input id="km-'+key+'" type="number" min
 }
 return out+'</div>';
 }
-function saveBlockRM(week){let vals={squat:Number($('blockRmSquat-'+week).value)||0,bench:Number($('blockRmBench-'+week).value)||0,deadlift:Number($('blockRmDeadlift-'+week).value)||0};if(Object.values(vals).some(v=>!(v>0))){alert('Bitte alle drei neuen 1RM-Werte eintragen.');return}activePlan.oneRM=vals;activePlan.oneRMBlocks=activePlan.oneRMBlocks||[vals];let nextBlock=Math.min(3,Math.floor(week/5));activePlan.oneRMBlocks[nextBlock]=vals;save();renderPlan();refresh();alert(week===15?'Neue Abschluss-1RM-Werte gespeichert.':'Neue 1RM-Werte gespeichert. Sie gelten für den nächsten Block.')}
+
 
 function completeDay(key,type){
 let week=Math.floor(key/activePlan.days)+1,day=key%activePlan.days+1,summary='';
@@ -296,13 +343,13 @@ if(structured&&week===1&&!isCoreLift(val)&&!isBikeExercise(val)){
  let reps=weekReps(val,week,ex.sets),pct=tablePercent(reps,weekRPE(week));
  if(pct)activePlan.exerciseBases[val]={oneRM:weight/pct,sourceWeight:weight,reps,rpe:weekRPE(week)};
 }
-weights.push(bikeInStrength?{name:val,minutes:weight}:{name:val,sets:ex.sets,weight});
+let exerciseReps=weekReps(val,week,ex.sets),exerciseRpe=weekRPE(week);weights.push(bikeInStrength?{name:val,minutes:weight}:{name:val,sets:ex.sets,weight,reps:exerciseReps,rpe:exerciseRpe});
 }
 let note=$('note-'+key).value;
 summary=weights.map(e=>e.name==='Fahrrad'?e.name+' · '+e.minutes+' min':e.name+' '+e.sets+(e.weight!==null?' · '+e.weight+' kg':'')).join(', ')+(note?' · '+note:'');
 logs.push({type,date:new Date().toISOString().slice(0,10),exercises:weights,summary:'Woche '+week+', Tag '+day+': '+summary});
 }
-activePlan.completed.push({key,summary,date:new Date().toISOString().slice(0,10)});selectedDayKey=null;save();renderPlan();refresh();
+activePlan.completed.push({key,summary,date:new Date().toISOString().slice(0,10),exercises:type==='bike'?[]:(logs[logs.length-1]?.exercises||[])});selectedDayKey=null;save();renderPlan();refresh();
 }
 function skipDay(key){if(!confirm('Diesen Trainingstag als ausgefallen markieren?'))return;activePlan.skipped.push({key,date:new Date().toISOString().slice(0,10)});selectedDayKey=null;save();renderPlan()}
 function undoSkip(key){activePlan.skipped=activePlan.skipped.filter(x=>x.key!==key);save();renderPlan()}
