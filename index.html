@@ -83,7 +83,7 @@ body{background-color:#050609;min-height:100vh;min-height:100dvh;overflow-x:hidd
 main,main section,.card,.week-block,.week-fold{min-width:0;max-width:100%}
 .row>*{min-width:0}
 img,svg,video,canvas{max-width:100%}
-.history-item{display:flex;align-items:flex-start;gap:10px}
+.history-fold>summary{display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;list-style:none}.history-fold>summary::-webkit-details-marker{display:none}.history-fold>summary h2{margin:0}.history-fold>summary:after{content:'＋';color:var(--red);font-size:18px}.history-fold[open]>summary:after{content:'−'}.goal-icon{width:22px;height:22px;vertical-align:middle;margin-right:5px;color:#f5f5f7}.history-item{display:flex;align-items:flex-start;gap:10px}
 .history-content{flex:1;min-width:0;overflow-wrap:anywhere}
 .history-delete{flex:0 0 auto;padding:8px 10px;font-size:11px;background:#292a31;border:1px solid #62404a;box-shadow:none;white-space:nowrap}
 @media(max-width:430px){
@@ -232,7 +232,7 @@ main{padding-bottom:calc(112px + env(safe-area-inset-bottom))!important}
 <label>Planname</label><input id="planName" value="Mein Hybridplan"><div id="rmFields"><label>Deine aktuellen 1RM-Werte (kg)</label><div class="rm-grid"><div><label>Kniebeugen</label><input id="rmSquat" type="number" min="1" step="0.5" placeholder="140"></div><div><label>Bankdrücken</label><input id="rmBench" type="number" min="1" step="0.5" placeholder="110"></div><div><label>Kreuzheben</label><input id="rmDeadlift" type="number" min="1" step="0.5" placeholder="180"></div></div></div><button onclick="makePlan()">Trainingsplan erstellen</button></div><div id="planOutput"></div></section>
 
 <section id="exercises" class="hidden"><div class="eyebrow">Trainingsbibliothek</div><h1>Übungsübersicht</h1><p>Deine Übungen, sortiert nach Muskelgruppen.</p><div class="card"><h2>Übung hinzufügen</h2><label for="newExerciseName">Name der Übung</label><input id="newExerciseName" placeholder="z. B. Seitheben"><label for="newExerciseGroup">Muskelgruppe</label><select id="newExerciseGroup"><option>Brust</option><option>Rücken</option><option>Schultern</option><option>Beine & Gesäß</option><option>Bizeps</option><option>Trizeps</option><option>Bauch & Core</option><option>Ausdauer</option><option>Sonstiges</option></select><button type="button" onclick="addLibraryExercise()">Übung hinzufügen</button></div><div id="exerciseOverview"></div></section>
-<section id="profile" class="hidden"><div class="eyebrow">Einstellungen</div><h1>Profile</h1><div class="card"><label>Aktives Profil auswählen</label><select id="profilePicker" onchange="switchProfile(this.value)"></select><div class="profile-actions"><button class="secondary" onclick="newProfile()">+ Neues Profil</button><button class="plan-delete" onclick="deleteProfile()">Profil löschen</button></div></div><div class="card"><label>Profilname</label><input id="athleteName" placeholder="Name"><label>Körpergewicht (kg)</label><input id="bodyWeight" type="number" step="0.1"><label>Trainingsziel</label><select id="goal"><option value="strength">Kraftaufbau</option><option value="diet">Diät</option><option value="endurance">Ausdauer</option></select><button onclick="saveProfile()">Profil speichern</button></div><div class="card"><h2>Trainingsverlauf</h2><div id="historyList" class="history-list">Noch keine Einheiten abgeschlossen.</div><div class="row"><button class="secondary" onclick="exportData()">Daten exportieren</button><button class="secondary" onclick="$('importFile').click()">Daten importieren</button></div><input id="importFile" type="file" accept=".json,application/json" class="hidden" onchange="importData(event)"><p>Der Verlauf gehört immer zum ausgewählten Profil. Exportiere regelmäßig eine Sicherung deiner Daten.</p></div><div class="card"><h2>HybridMelvin</h2><p>Version 0.6</p></div></section>
+<section id="profile" class="hidden"><div class="eyebrow">Einstellungen</div><h1>Profile</h1><div class="card"><label>Aktives Profil auswählen</label><select id="profilePicker" onchange="switchProfile(this.value)"></select><div class="profile-actions"><button class="secondary" onclick="newProfile()">+ Neues Profil</button><button class="plan-delete" onclick="deleteProfile()">Profil löschen</button></div></div><div class="card"><label>Profilname</label><input id="athleteName" placeholder="Name"><label>Körpergewicht (kg)</label><input id="bodyWeight" type="number" step="0.1"><label>Trainingsziel</label><select id="goal"><option value="strength">Kraftaufbau</option><option value="diet">Diät</option><option value="endurance">Ausdauer</option></select><button onclick="saveProfile()">Profil speichern</button></div><div class="card"><details class="history-fold"><summary><h2>Trainingsverlauf</h2><span class="muted">Anzeigen / Ausblenden</span></summary><div id="historyList" class="history-list">Noch keine Einheiten abgeschlossen.</div><div class="row"><button class="secondary" onclick="exportData()">Daten exportieren</button><button class="secondary" onclick="$('importFile').click()">Daten importieren</button></div><input id="importFile" type="file" accept=".json,application/json" class="hidden" onchange="importData(event)"><p>Der Verlauf gehört immer zum ausgewählten Profil. Exportiere regelmäßig eine Sicherung deiner Daten.</p></details></div><div class="card"><h2>HybridMelvin</h2><p>Version 0.6</p></div></section>
 </main>
 <nav><button class="active" data-tab="dashboard" onclick="show('dashboard')">⌂<br>Start</button><button data-tab="plans" onclick="show('plans')">▤<br>Pläne</button><button data-tab="log" onclick="show('log')">＋<br>Eintragen</button><button data-tab="exercises" onclick="show('exercises')">▦<br>Übungen</button><button data-tab="profile" onclick="show('profile')">◎<br>Profil</button></nav>
 <script>
@@ -266,7 +266,7 @@ function esc(v){return String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt
 function show(id){document.querySelectorAll('main section').forEach(e=>e.classList.toggle('hidden',e.id!==id));document.querySelectorAll('nav button').forEach(e=>e.classList.toggle('active',e.dataset.tab===id));if(id==='dashboard')refresh();if(id==='plans')renderPlan();if(id==='history')renderHistory();if(id==='profile'){renderProfiles();renderHistory()}if(id==='exercises')renderExerciseOverview();}
 function line(x,index){return '<div class="item history-item"><div class="history-content"><b>'+(x.type==='bike'?'🚴 Rennrad/Gravel':'🏋️ Krafttraining')+'</b> · '+esc(x.date)+'<br><span class="muted">'+esc(x.summary)+'</span></div><button type="button" class="history-delete" aria-label="Training löschen" onclick="deleteLog('+index+')">Löschen</button></div>'}
 function trainingRankMarkup(total){if(total<1)return '';if(total<=10)return '<span class="rank-badge noob">NOOB</span>';if(total<=50)return '<span class="rank-badge beginner">BEGINNER</span>';if(total<=100)return '<span class="rank-badge advanced">FORTGESCHRITTEN</span>';if(total<=150)return '<span class="rank-badge pro">PROFI</span>';let tier=total<200?'bronze':total<300?'silver':'gold',label=tier.toUpperCase(),color=tier==='bronze'?'#cd8b58':tier==='silver'?'#c9cdd5':'#e6bd52';return '<span class="laurel-badge '+tier+'"><svg viewBox="0 0 40 42" aria-hidden="true"><path d="M13 36C3 26 4 12 13 4M27 36C37 26 36 12 27 4" fill="none" stroke="'+color+'" stroke-width="2.1" stroke-linecap="round"/><g fill="'+color+'"><ellipse cx="8" cy="29" rx="3" ry="5" transform="rotate(-48 8 29)"/><ellipse cx="6" cy="21" rx="3" ry="5" transform="rotate(-30 6 21)"/><ellipse cx="7" cy="13" rx="3" ry="5" transform="rotate(-12 7 13)"/><ellipse cx="12" cy="7" rx="3" ry="5" transform="rotate(28 12 7)"/><ellipse cx="32" cy="29" rx="3" ry="5" transform="rotate(48 32 29)"/><ellipse cx="34" cy="21" rx="3" ry="5" transform="rotate(30 34 21)"/><ellipse cx="33" cy="13" rx="3" ry="5" transform="rotate(12 33 13)"/><ellipse cx="28" cy="7" rx="3" ry="5" transform="rotate(-28 28 7)"/></g><path d="M13 37Q20 41 27 37" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round"/></svg><span>'+label+'</span></span>'}
-function refresh(){$('totalTrainings').textContent=logs.length;$('trainingRank').innerHTML=trainingRankMarkup(logs.length);$('strengthCount').textContent=logs.filter(x=>x.type==='strength').length;$('kmCount').textContent=logs.reduce((a,x)=>a+(Number(x.distance)||0),0).toFixed(1);let rm=activePlan?.oneRM||{};['squat','bench','deadlift'].forEach((key)=>{let el=$('dash'+({squat:'Squat',bench:'Bench',deadlift:'Deadlift'}[key]));let blocks=(activePlan?.oneRMBlocks||[]).filter(Boolean);let previous=blocks.length>1?blocks[blocks.length-2]:null;let value=rm[key];let arrow='';if(previous&&Number(value)>0&&Number(previous[key])>0&&Number(value)!==Number(previous[key])){let up=Number(value)>Number(previous[key]);arrow='<span style="font-size:17px;color:'+(up?'#63d68b':'#f04452')+';margin-left:6px;font-weight:900">'+(up?'↑':'↓')+'</span>'}el.innerHTML=value?esc(value)+' kg '+arrow:'–'});let hist=profile.weightHistory||[],cur=Number(profile.weight)||0,prev=hist.length>1?Number(hist[hist.length-2].weight):0;$('dashWeight').textContent=cur?cur.toFixed(1)+' kg':'– kg';$('weightTrend').textContent=cur&&prev?(cur<prev?'↓':'↑'):'—';$('weightTrend').style.color=cur&&prev?(cur<prev?'#63d68b':'#ed4057'):'#b0b2bb';$('weightGoal').textContent=({strength:'💪 Kraftaufbau',diet:'🥗 Diät',endurance:'🚴 Ausdauer'}[profile.goal]||'Ziel auswählen')+' · '+(activeProfile.name||'Profil');$('activeProfileBadge').textContent=activeProfile.name||'Profil'}
+function refresh(){$('totalTrainings').textContent=logs.length;$('trainingRank').innerHTML=trainingRankMarkup(logs.length);$('strengthCount').textContent=logs.filter(x=>x.type==='strength').length;$('kmCount').textContent=logs.reduce((a,x)=>a+(Number(x.distance)||0),0).toFixed(1);let rm=activePlan?.oneRM||{};['squat','bench','deadlift'].forEach((key)=>{let el=$('dash'+({squat:'Squat',bench:'Bench',deadlift:'Deadlift'}[key]));let blocks=(activePlan?.oneRMBlocks||[]).filter(Boolean);let previous=blocks.length>1?blocks[blocks.length-2]:null;let value=rm[key];let arrow='';if(previous&&Number(value)>0&&Number(previous[key])>0&&Number(value)!==Number(previous[key])){let up=Number(value)>Number(previous[key]);arrow='<span style="font-size:17px;color:'+(up?'#63d68b':'#f04452')+';margin-left:6px;font-weight:900">'+(up?'↑':'↓')+'</span>'}el.innerHTML=value?esc(value)+' kg '+arrow:'–'});let hist=profile.weightHistory||[],cur=Number(profile.weight)||0,prev=hist.length>1?Number(hist[hist.length-2].weight):0;$('dashWeight').textContent=cur?cur.toFixed(1)+' kg':'– kg';$('weightTrend').textContent=cur&&prev?(cur<prev?'↓':'↑'):'—';$('weightTrend').style.color=cur&&prev?(cur<prev?'#63d68b':'#ed4057'):'#b0b2bb';$('weightGoal').innerHTML=({strength:'<svg class="goal-icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 48c-5-4-7-10-5-16 2-5 7-8 12-8 1-8 7-13 14-12 6 1 9 6 9 12 7 0 12 5 12 12 0 8-6 13-14 13H25c-4 0-8 0-11-1Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 25c-1 5 1 9 5 11m19-12c-3 3-4 7-3 11M25 49l-2 5m17-5 2 5" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg> Kraftaufbau',diet:'🥗 Diät',endurance:trainingIcon('Rennrad')+' Ausdauer'}[profile.goal]||'Ziel auswählen')+' · '+(activeProfile.name||'Profil');$('activeProfileBadge').textContent=activeProfile.name||'Profil'}
 
 const ONE_RM_REP_TABLE={1:100,2:95,3:90,4:88,5:86,6:83,7:80,8:78,9:76,10:75};
 const RPE_TABLE={
@@ -282,6 +282,7 @@ function isCoreLift(name){let n=String(name).trim().toLowerCase();return ['knieb
 function isBikeExercise(name){return /^(fahrrad|bike)$/i.test(String(name).trim())}
 function parseSets(value){let m=String(value||'').match(/^(\d+)\s*x\s*(\d+)/i);return m?Number(m[1]):3}
 function weekReps(name,week,baseSets){
+if(activePlan?.type==='hybrid'){let fixed=activePlan.dayTemplates?.flatMap(d=>d.exercises||[]).find(e=>e.name===name&&Number.isFinite(Number(e.reps)));if(fixed)return Number(fixed.reps)}
 let core=isCoreLift(name),b=Math.floor((week-1)/5),w=(week-1)%5+1;
 if(core)return b===0?(w===5?6:5):b===1?(w===5?6:3):(w===5?6:w===4?1:2);
 return [10,9,8][b]||10;
@@ -309,7 +310,57 @@ localStorage.setItem('hm_custom_exercises',JSON.stringify(customExerciseGroups))
 renderExerciseOverview();
 }
 
-function makePlan(){let t=$('planType').value,n=Number($('days').value),blockCount=Number($('blockCount').value)||3,totalWeeks=blockCount*5,sch=[];let oneRM={squat:Number($('rmSquat').value)||0,bench:Number($('rmBench').value)||0,deadlift:Number($('rmDeadlift').value)||0};let needsRM=t==='strength'||(t==='hybrid'&&Number($('strengthDays').value)>0);if(needsRM&&(!oneRM.squat||!oneRM.bench||!oneRM.deadlift)){alert('Bitte alle drei 1RM-Werte eintragen.');return}if(t==='hybrid'){let b=Number($('bikeDays').value),st=Number($('strengthDays').value);if(b+st!==n){alert('Rad- und Krafttage müssen zusammen der Gesamtzahl entsprechen.');return}let rb=b,rs=st;for(let i=0;i<n;i++){if(rb>0&&(rs===0||rb>=rs)){sch.push('Rennrad');rb--}else{sch.push('Krafttraining');rs--}}}else sch=Array(n).fill(t==='strength'?'Krafttraining':'Rennrad');let days=sch.map((kind,i)=>({kind,exercises:kind==='Krafttraining'?JSON.parse(JSON.stringify(strengthTemplate[i%4])):[]}));activePlan={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,7),name:$('planName').value||'Mein Plan',type:t,days:n,blockCount,totalWeeks,schedule:sch,dayTemplates:days,oneRM:needsRM?oneRM:null,oneRMBlocks:needsRM?[oneRM]:[],completed:[],skipped:[],created:Date.now()};plans.push(activePlan);selectedPlanId=activePlan.id;selectedDayKey=null;selectedRMWeek=null;save();renderPlan();$('planOutput').innerHTML='<div class="card"><span class="pill">PLAN AKTIV</span><h2>'+esc(activePlan.name)+'</h2><p>'+totalWeeks+' Wochen · '+blockCount+' '+(blockCount===1?'Block':'Blöcke')+' · '+n+' Trainingstage pro Woche</p><button onclick="show(\'plans\')">Plan ansehen</button></div>';alert('Dein Trainingsplan wurde erstellt.')}
+const hybridFullBody=[
+{name:'Bankdrücken',sets:'3x4',reps:4},
+{name:'Rumänisches Kreuzheben',sets:'2x6',reps:6},
+{name:'Latzug',sets:'3x8',reps:8},
+{name:'Schulterdrücken',sets:'2x8',reps:8},
+{name:'Kurzhantel Curls',sets:'3x8',reps:8},
+{name:'Triceps',sets:'3x8',reps:8},
+{name:'Bauch crunch Maschine',sets:'2x8',reps:8}
+];
+const hybridUpper=[
+{name:'Kreuzheben',sets:'3x4',reps:4},
+{name:'Bankdrücken',sets:'3x4',reps:4},
+{name:'Latzug',sets:'3x8',reps:8},
+{name:'Bizeps',sets:'3x8',reps:8},
+{name:'Triceps',sets:'3x8',reps:8}
+];
+const hybridLower=[
+{name:'Kniebeuge',sets:'3x4',reps:4},
+{name:'Bankdrücken',sets:'3x4',reps:4},
+{name:'Beinstrecker',sets:'3x8',reps:8},
+{name:'Schulterdrücken',sets:'3x8',reps:8},
+{name:'Bauch crunch Maschine',sets:'3x8',reps:8}
+];
+function makePlan(){
+let t=$('planType').value,n=Number($('days').value),blockCount=Number($('blockCount').value)||3,totalWeeks=blockCount*5,sch=[];
+let oneRM={squat:Number($('rmSquat').value)||0,bench:Number($('rmBench').value)||0,deadlift:Number($('rmDeadlift').value)||0};
+let bikeDays=0,strengthDays=0;
+if(t==='hybrid'){
+ strengthDays=n>=5?2:1;bikeDays=n-strengthDays;
+}
+let needsRM=t==='strength'||(t==='hybrid'&&strengthDays>0);
+if(needsRM&&(!oneRM.squat||!oneRM.bench||!oneRM.deadlift)){alert('Bitte alle drei 1RM-Werte eintragen.');return}
+if(t==='hybrid'){
+ let rb=bikeDays,rs=strengthDays;
+ for(let i=0;i<n;i++){
+  if(rb>0&&(rs===0||rb>=rs)){sch.push('Rennrad');rb--}
+  else{sch.push('Krafttraining');rs--}
+ }
+}else sch=Array(n).fill(t==='strength'?'Krafttraining':'Rennrad');
+let strengthIndex=0;
+let days=sch.map(kind=>{
+ if(kind!=='Krafttraining')return {kind,exercises:[]};
+ let exercises=t==='hybrid'?JSON.parse(JSON.stringify(strengthDays===1?hybridFullBody:(strengthIndex===0?hybridUpper:hybridLower))):JSON.parse(JSON.stringify(strengthTemplate[strengthIndex%4]));
+ strengthIndex++;
+ return {kind,exercises};
+});
+activePlan={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,7),name:$('planName').value||'Mein Plan',type:t,days:n,blockCount,totalWeeks,schedule:sch,dayTemplates:days,oneRM:needsRM?oneRM:null,oneRMBlocks:needsRM?[oneRM]:[],completed:[],skipped:[],created:Date.now()};
+plans.push(activePlan);selectedPlanId=activePlan.id;selectedDayKey=null;selectedRMWeek=null;save();renderPlan();
+$('planOutput').innerHTML='<div class="card"><span class="pill">PLAN AKTIV</span><h2>'+esc(activePlan.name)+'</h2><p>'+totalWeeks+' Wochen · '+blockCount+' '+(blockCount===1?'Block':'Blöcke')+' · '+n+' Trainingstage pro Woche</p><button onclick="show(\'plans\')">Plan ansehen</button></div>';
+alert('Dein Trainingsplan wurde erstellt.');
+}
 function ensurePlan(){if(!activePlan)return;if(!activePlan.completed)activePlan.completed=[];if(!activePlan.skipped)activePlan.skipped=[];if(activePlan.type!=='bike'&&!activePlan.oneRMBlocks)activePlan.oneRMBlocks=[activePlan.oneRM||{squat:0,bench:0,deadlift:0}];if(!activePlan.dayTemplates){activePlan.dayTemplates=activePlan.schedule.map((kind,i)=>({kind,exercises:kind==='Krafttraining'?JSON.parse(JSON.stringify(strengthTemplate[i%4])):[]}));activePlan.skipped=activePlan.skipped||[];save()}activePlan.skipped=activePlan.skipped||[];let renamed=false;activePlan.dayTemplates.forEach(day=>(day.exercises||[]).forEach(ex=>{if(ex.name==='Squats'){ex.name='Kniebeuge';renamed=true}if(ex.name==='Bike'){ex.name='Fahrrad';renamed=true}}));if(renamed)save()}
 function renderPlanChoices(){let box=$('planChoices');if(!plans.length){box.innerHTML='<span class="muted">Noch keine Pläne gespeichert.</span>';return}box.innerHTML=plans.slice().reverse().map(p=>'<div class="plan-choice '+(p.id===selectedPlanId?'selected':'')+'"><div><b>'+esc(p.name)+'</b><br><small class="muted">'+p.days+' Tage/Woche · '+(p.totalWeeks||p.blockCount*5||15)+' Wochen</small></div><button class="'+(p.id===selectedPlanId?'':'secondary')+'" onclick="selectPlan(\''+p.id+'\')">'+(p.id===selectedPlanId?'Angezeigt':'Ansehen')+'</button></div>').join('')}
 function selectPlan(id){let p=plans.find(x=>x.id===id);if(!p)return;activePlan=p;selectedPlanId=id;selectedDayKey=null;save();renderPlan();refresh()}
@@ -359,7 +410,7 @@ let out='<div class="day-detail"><div class="week-title"><b>'+trainingIcon(day.k
 if(e)out+='<p>'+esc(e.summary)+'<br><small>'+esc(e.date)+'</small></p>';
 else if(skip)out+='<p class="muted">Als ausgefallen markiert.</p><button type="button" class="ghost" onclick="undoSkip('+key+')">Markierung zurücknehmen</button>';
 else if(day.kind==='Krafttraining'){
-let editable=week===1;out+='<p class="muted">'+(editable?'Woche 1: Übungsauswahl und Ausgangsgewichte eintragen.':'Fester Übungsplan – Änderungen sind gesperrt.')+'</p>';
+let editable=week===1&&activePlan.type!=='hybrid';out+='<p class="muted">'+(activePlan.type==='hybrid'?'Fester Hybrid-Trainingsplan – Übungen und Vorgaben sind gesperrt.':(editable?'Woche 1: Übungsauswahl und Ausgangsgewichte eintragen.':'Fester Übungsplan – Änderungen sind gesperrt.'))+'</p>';
 if(structured)out+='';
 if(!Array.isArray(day.exercises))day.exercises=[];
 day.exercises.forEach((ex,j)=>{
@@ -488,7 +539,7 @@ function switchProfile(id){let p=profiles.find(x=>x.id===id);if(!p)return;active
 function newProfile(){let name=prompt('Name des neuen Profils:');if(!name||!name.trim())return;let p={id:'profile-'+Date.now(),name:name.trim(),weight:'',goal:'strength',weightHistory:[],logs:[],plans:[],selectedPlanId:null};profiles.push(p);switchProfile(p.id);show('profile')}
 function deleteProfile(){if(profiles.length<=1){alert('Mindestens ein Profil muss erhalten bleiben.');return}if(!confirm('Dieses Profil mit seinen Plänen und Statistiken löschen?'))return;profiles=profiles.filter(p=>p.id!==activeProfileId);switchProfile(profiles[0].id);show('profile')}
 function saveProfile(){let newWeight=$('bodyWeight').value,oldWeight=Number(profile.weight)||0,weight=Number(newWeight)||0;profile.name=$('athleteName').value.trim()||'Mein Profil';profile.goal=$('goal').value;profile.weight=newWeight;profile.weightHistory=profile.weightHistory||[];if(weight>0&&weight!==oldWeight)profile.weightHistory.push({weight,date:new Date().toISOString().slice(0,10)});activeProfile=profile;save();renderProfiles();refresh();alert('Profil gespeichert.')}
-function updatePlanForm(){let t=$('planType').value,d=Number($('days').value);$('rmFields').classList.toggle('hidden',t==='bike');$('splitFields').classList.toggle('hidden',t!=='hybrid');$('singleHint').textContent=t==='hybrid'?'':(t==='strength'?'Alle '+d+' Tage: Krafttraining.':'Alle '+d+' Tage: Rennrad/Gravel.');if(t==='hybrid'){let b=Math.round(d*.66),st=d-b;$('bikeDays').innerHTML=Array.from({length:d+1},(_,i)=>'<option value="'+i+'" '+(i===b?'selected':'')+'>'+i+'</option>').join('');$('strengthDays').innerHTML=Array.from({length:d+1},(_,i)=>'<option value="'+i+'" '+(i===st?'selected':'')+'>'+i+'</option>').join('');$('splitHint').textContent='Empfohlene Aufteilung: '+b+' Rad-/Graveltage und '+st+' Krafttage.';let update=()=>{$('splitAdvice').textContent='Ausgewählt: '+$('bikeDays').value+' Rad-/Graveltage + '+$('strengthDays').value+' Krafttage '+(Number($('bikeDays').value)+Number($('strengthDays').value)===d?'✓':'– Summe stimmt noch nicht')};$('bikeDays').onchange=update;$('strengthDays').onchange=update;update()}}
+function updatePlanForm(){let t=$('planType').value,d=Number($('days').value);$('rmFields').classList.toggle('hidden',t==='bike');$('splitFields').classList.add('hidden');$('singleHint').textContent=t==='hybrid'?'Feste Aufteilung: '+(d>=5?2:1)+' Krafttage + '+(d-(d>=5?2:1))+' Rad-/Graveltage.':(t==='strength'?'Alle '+d+' Tage: Krafttraining.':'Alle '+d+' Tage: Rennrad/Gravel.');}
 $('planType').addEventListener('change',updatePlanForm);$('days').addEventListener('change',updatePlanForm);renderProfiles();updatePlanForm();refresh();renderPlan();
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script></body></html>
