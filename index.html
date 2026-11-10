@@ -288,7 +288,7 @@ return [10,9,8][b]||10;
 }
 function tablePercent(reps,rpe){let row=RPE_TABLE[Number(rpe)];return row&&reps>=1&&reps<=12?row[reps-1]/100:null}
 function exerciseRecommendation(name,week,sets){
-if(activePlan?.type!=='strength'||isBikeExercise(name))return null;
+if(!['strength','hybrid'].includes(activePlan?.type)||isBikeExercise(name))return null;
 let reps=weekReps(name,week,sets),rpe=weekRPE(week),pct=tablePercent(reps,rpe),base=null;
 if(isCoreLift(name)){let block=Math.floor((week-1)/5),key=name.toLowerCase().startsWith('kniebeuge')?'squat':name.toLowerCase().startsWith('bankdrücken')?'bench':'deadlift';base=activePlan.oneRMBlocks?.[block]?.[key]||activePlan.oneRM?.[key]}
 else base=activePlan.exerciseBases?.[name]?.oneRM;
@@ -354,7 +354,7 @@ save();renderPlan();refresh();
 alert(rating==='good'?'Starker Block! Die errechneten 1RM-Werte gelten als Grundlage für den nächsten Block.':rating==='neutral'?'Blockbewertung gespeichert. Die 1RM-Werte bleiben unverändert.':'Blockbewertung gespeichert. Die 1RM-Werte wurden für den nächsten Block um 5 % reduziert.');
 }
 function renderDayDetail(week,key){
-let d=key%activePlan.days,day=activePlan.dayTemplates[d],e=activePlan.completed.find(z=>z.key===key),skip=activePlan.skipped.find(z=>z.key===key),structured=activePlan.type==='strength';
+let d=key%activePlan.days,day=activePlan.dayTemplates[d],e=activePlan.completed.find(z=>Number(z.key)===key),skip=activePlan.skipped.find(z=>Number(z.key)===key),structured=['strength','hybrid'].includes(activePlan.type);
 let out='<div class="day-detail"><div class="week-title"><b>'+trainingIcon(day.kind)+' Tag '+(d+1)+' · '+esc(day.kind==='Rennrad'?'Rennrad/Gravel':day.kind)+'</b>'+(e?'<span class="done-tag">✓ ERLEDIGT</span>':skip?'<span class="deload">↷ AUSGEFALLEN</span>':'<span class="pill">'+(week%5===0?'DELOAD':'OFFEN')+'</span>')+'</div>';
 if(e)out+='<p>'+esc(e.summary)+'<br><small>'+esc(e.date)+'</small></p>';
 else if(skip)out+='<p class="muted">Als ausgefallen markiert.</p><button type="button" class="ghost" onclick="undoSkip('+key+')">Markierung zurücknehmen</button>';
@@ -392,8 +392,8 @@ summary=km+' km'+(timeEl&&Number(timeEl.value)?' · '+timeEl.value+' min':'')+(n
 entry={type:'bike',date:new Date().toISOString().slice(0,10),distance:km,summary:'Woche '+week+', Tag '+day+': '+summary};
 }else{
 let template=activePlan.dayTemplates?.[key%activePlan.days];
-if(!template||!Array.isArray(template.exercises)){alert('Der Trainingsplan für diesen Tag ist unvollständig.');return}
-let weights=[],structured=activePlan.type==='strength',baseUpdates={};
+if(!template||template.kind!=='Krafttraining'||!Array.isArray(template.exercises)){alert('Der Trainingsplan für diesen Tag ist unvollständig.');return}
+let weights=[],structured=['strength','hybrid'].includes(activePlan.type),baseUpdates={};
 for(let j=0;j<template.exercises.length;j++){
 let ex=template.exercises[j],selectEl=$('ex-'+key+'-'+j);
 let val=week===1&&!isCoreLift(ex.name)?(selectEl?selectEl.value:ex.name):ex.name;
@@ -416,18 +416,70 @@ activePlan.exerciseBases=activePlan.exerciseBases||{};
 Object.assign(activePlan.exerciseBases,baseUpdates);
 entry={type:'strength',date:new Date().toISOString().slice(0,10),exercises:weights,summary:'Woche '+week+', Tag '+day+': '+summary};
 }
+entry.planId=activePlan.id;entry.dayKey=key;
 logs.push(entry);
 activePlan.completed.push({key,summary,date:entry.date,exercises:entry.exercises||[]});
 selectedDayKey=key;save();renderPlan();renderHistory();refresh();
 }
-function skipDay(key){if(!confirm('Diesen Trainingstag als ausgefallen markieren?'))return;activePlan.skipped.push({key,date:new Date().toISOString().slice(0,10)});selectedDayKey=key;save();renderPlan()}
-function undoSkip(key){activePlan.skipped=activePlan.skipped.filter(x=>x.key!==key);selectedDayKey=key;save();renderPlan()}
+function skipDay(key){
+if(!activePlan||!Number.isInteger(Number(key))||Number(key)<0)return;
+key=Number(key);
+if(activePlan.completed.some(x=>Number(x.key)===key)){alert('Dieser Trainingstag ist bereits abgeschlossen.');return}
+if(activePlan.skipped.some(x=>Number(x.key)===key)){alert('Dieser Trainingstag ist bereits als ausgefallen markiert.');return}
+if(!confirm('Diesen Trainingstag als ausgefallen markieren?'))return;
+activePlan.skipped.push({key,date:new Date().toISOString().slice(0,10)});
+selectedDayKey=key;save();renderPlan()
+}
+function undoSkip(key){if(!activePlan)return;activePlan.skipped=activePlan.skipped.filter(x=>Number(x.key)!==Number(key));selectedDayKey=Number(key);save();renderPlan()}
 function resetPlan(){if(!activePlan||!confirm('Fortschritt dieses Plans wirklich zurücksetzen?'))return;activePlan.completed=[];activePlan.skipped=[];save();renderPlan()}
 function deletePlan(){if(!activePlan||!confirm('Diesen Trainingsplan endgültig löschen?'))return;plans=plans.filter(p=>p.id!==activePlan.id);activePlan=plans[plans.length-1]||null;selectedPlanId=activePlan?activePlan.id:null;selectedDayKey=null;save();renderPlan();refresh()}
 function renderHistory(){$('historyList').innerHTML=logs.length?logs.map((entry,index)=>({entry,index})).reverse().map(x=>line(x.entry,x.index)).join(''):'Noch keine Einheiten abgeschlossen.'}
-function deleteLog(index){if(!Number.isInteger(index)||index<0||index>=logs.length)return;if(!confirm('Diesen Trainingseintrag endgültig aus dem Verlauf löschen?'))return;logs.splice(index,1);save();renderHistory();refresh()}
+function deleteLog(index){
+if(!Number.isInteger(index)||index<0||index>=logs.length)return;
+if(!confirm('Diesen Trainingseintrag endgültig aus dem Verlauf löschen?'))return;
+let entry=logs[index];
+logs.splice(index,1);
+if(activePlan){
+ if(entry.planId===activePlan.id&&Number.isInteger(Number(entry.dayKey))){
+  let key=Number(entry.dayKey);activePlan.completed=activePlan.completed.filter(x=>Number(x.key)!==key);
+ }else{
+  let match=activePlan.completed.find(x=>x.date===entry.date&&x.summary===entry.summary);
+  if(match)activePlan.completed=activePlan.completed.filter(x=>x!==match);
+ }
+}
+save();renderHistory();renderPlan();refresh()
+}
 function exportData(){save();let backup={format:'HybridMelvin-Backup',version:2,exportedAt:new Date().toISOString(),profiles:profiles,activeProfileId:activeProfileId,logs,plans,activePlan,profile};let a=document.createElement('a'),u=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}));a.href=u;a.download='hybridmelvin-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
-function importData(event){let file=event.target.files&&event.target.files[0];if(!file)return;let reader=new FileReader();reader.onload=()=>{try{let data=JSON.parse(reader.result);if(!confirm('Die Sicherung importieren? Deine aktuell gespeicherten Profile und Trainingsdaten werden ersetzt.')){event.target.value='';return}if(Array.isArray(data.profiles)&&data.profiles.length){profiles=data.profiles.map(p=>({...p,logs:Array.isArray(p.logs)?p.logs:[],plans:Array.isArray(p.plans)?p.plans:[],weightHistory:Array.isArray(p.weightHistory)?p.weightHistory:[]}));activeProfileId=profiles.some(p=>p.id===data.activeProfileId)?data.activeProfileId:profiles[0].id}else if(Array.isArray(data.logs)&&Array.isArray(data.plans)){let restoredPlans=data.plans.slice();if(data.activePlan&&!restoredPlans.some(p=>p.id===data.activePlan.id))restoredPlans.push(data.activePlan);let oldProfile=data.profile||{};profiles=[{id:'profile-import-'+Date.now(),name:oldProfile.name||'Importiertes Profil',weight:oldProfile.weight||'',goal:oldProfile.goal||'strength',weightHistory:oldProfile.weightHistory||[],logs:data.logs,plans:restoredPlans,selectedPlanId:data.activePlan?.id||restoredPlans[restoredPlans.length-1]?.id||null}];activeProfileId=profiles[0].id}else{throw new Error('Das ist keine gültige HybridMelvin-Sicherung.')}activeProfile=profiles.find(p=>p.id===activeProfileId)||profiles[0];activeProfileId=activeProfile.id;profile=activeProfile;logs=activeProfile.logs||[];plans=activeProfile.plans||[];selectedPlanId=activeProfile.selectedPlanId||null;activePlan=plans.find(p=>p.id===selectedPlanId)||plans[plans.length-1]||null;selectedDayKey=null;selectedRMWeek=null;save();renderProfiles();renderPlan();renderHistory();refresh();alert('Import erfolgreich! Deine Sicherung wurde wiederhergestellt.');show('dashboard')}catch(err){alert(err.message||'Import fehlgeschlagen. Die Datei konnte nicht gelesen werden.')}event.target.value=''};reader.onerror=()=>{alert('Die Datei konnte nicht gelesen werden.');event.target.value=''};reader.readAsText(file)}
+function importData(event){
+let file=event.target.files&&event.target.files[0];if(!file)return;
+let reader=new FileReader();
+reader.onload=()=>{
+ try{
+  let data=JSON.parse(reader.result),nextProfiles=[],nextActiveId=null;
+  const validPlan=p=>p&&typeof p==='object'&&typeof p.id==='string'&&Number.isInteger(Number(p.days))&&Number(p.days)>0&&Number(p.days)<=7&&Array.isArray(p.schedule)&&Array.isArray(p.dayTemplates)&&p.dayTemplates.length===Number(p.days)&&p.dayTemplates.every(d=>d&&typeof d.kind==='string'&&Array.isArray(d.exercises||[]));
+  const validProfile=p=>p&&typeof p==='object'&&typeof p.id==='string'&&Array.isArray(p.logs)&&Array.isArray(p.plans)&&Array.isArray(p.weightHistory||[])&&p.plans.every(validPlan);
+  if(Array.isArray(data.profiles)&&data.profiles.length&&data.profiles.every(validProfile)){
+   nextProfiles=data.profiles.map(p=>({...p,logs:p.logs.slice(),plans:p.plans.map(plan=>({...plan,completed:Array.isArray(plan.completed)?plan.completed:[],skipped:Array.isArray(plan.skipped)?plan.skipped:[]})),weightHistory:Array.isArray(p.weightHistory)?p.weightHistory:[]}));
+   nextActiveId=nextProfiles.some(p=>p.id===data.activeProfileId)?data.activeProfileId:nextProfiles[0].id;
+  }else if(Array.isArray(data.logs)&&Array.isArray(data.plans)&&data.plans.every(validPlan)){
+   let restoredPlans=data.plans.map(plan=>({...plan,completed:Array.isArray(plan.completed)?plan.completed:[],skipped:Array.isArray(plan.skipped)?plan.skipped:[]}));
+   if(data.activePlan&&validPlan(data.activePlan)&&!restoredPlans.some(p=>p.id===data.activePlan.id))restoredPlans.push(data.activePlan);
+   let oldProfile=data.profile&&typeof data.profile==='object'?data.profile:{};
+   nextProfiles=[{id:'profile-import-'+Date.now(),name:oldProfile.name||'Importiertes Profil',weight:oldProfile.weight||'',goal:oldProfile.goal||'strength',weightHistory:Array.isArray(oldProfile.weightHistory)?oldProfile.weightHistory:[],logs:data.logs,plans:restoredPlans,selectedPlanId:data.activePlan?.id||restoredPlans[restoredPlans.length-1]?.id||null}];
+   nextActiveId=nextProfiles[0].id;
+  }else throw new Error('Die Sicherung ist unvollständig oder enthält ungültige Profile bzw. Trainingspläne.');
+  if(!confirm('Die Sicherung importieren? Deine aktuell gespeicherten Profile und Trainingsdaten werden ersetzt.')){event.target.value='';return}
+  profiles=nextProfiles;activeProfileId=nextActiveId;
+  activeProfile=profiles.find(p=>p.id===activeProfileId)||profiles[0];activeProfileId=activeProfile.id;profile=activeProfile;
+  logs=activeProfile.logs||[];plans=activeProfile.plans||[];selectedPlanId=activeProfile.selectedPlanId||null;
+  activePlan=plans.find(p=>p.id===selectedPlanId)||plans[plans.length-1]||null;
+  selectedDayKey=null;selectedRMWeek=null;save();renderProfiles();renderPlan();renderHistory();refresh();alert('Import erfolgreich! Deine Sicherung wurde wiederhergestellt.');show('dashboard')
+ }catch(err){alert(err.message||'Import fehlgeschlagen. Die Datei konnte nicht gelesen werden.')}
+ event.target.value=''
+};
+reader.onerror=()=>{alert('Die Datei konnte nicht gelesen werden.');event.target.value=''};
+reader.readAsText(file)
+}
 function renderProfiles(){let sel=$('profilePicker');if(!sel)return;sel.innerHTML=profiles.map(p=>'<option value="'+p.id+'" '+(p.id===activeProfileId?'selected':'')+'>'+esc(p.name||'Profil')+'</option>').join('');$('athleteName').value=profile.name||'';$('bodyWeight').value=profile.weight||'';$('goal').value=profile.goal||'strength';$('activeProfileBadge').textContent=profile.name||'Profil'}
 function switchProfile(id){let p=profiles.find(x=>x.id===id);if(!p)return;activeProfileId=id;activeProfile=p;profile=p;logs=p.logs||[];plans=p.plans||[];selectedPlanId=p.selectedPlanId||null;activePlan=plans.find(x=>x.id===selectedPlanId)||plans[plans.length-1]||null;selectedDayKey=null;save();renderProfiles();refresh();renderPlan();renderHistory()}
 function newProfile(){let name=prompt('Name des neuen Profils:');if(!name||!name.trim())return;let p={id:'profile-'+Date.now(),name:name.trim(),weight:'',goal:'strength',weightHistory:[],logs:[],plans:[],selectedPlanId:null};profiles.push(p);switchProfile(p.id);show('profile')}
