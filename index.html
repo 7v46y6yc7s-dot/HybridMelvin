@@ -381,14 +381,17 @@ return out+'</div>';
 function completeDay(key,type){
 if(!activePlan||!Number.isInteger(Number(key))){alert('Trainingsplan nicht gefunden.');return}
 key=Number(key);
+if(key<0||key>=((activePlan.totalWeeks||activePlan.blockCount*5||15)*activePlan.days)){alert('Dieser Trainingstag liegt außerhalb des Plans.');return}
 if(activePlan.completed.some(x=>Number(x.key)===key)){alert('Dieser Trainingstag ist bereits abgeschlossen.');return}
+if(activePlan.skipped?.some(x=>Number(x.key)===key)){alert('Dieser Trainingstag ist als ausgefallen markiert. Bitte zuerst die Markierung zurücknehmen.');return}
 let week=Math.floor(key/activePlan.days)+1,day=key%activePlan.days+1,summary='',entry=null;
 if(type==='bike'){
 let kmEl=$('km-'+key),timeEl=$('time-'+key),noteEl=$('note-'+key);
 if(!kmEl){alert('Die Eingabefelder für diesen Radtag wurden nicht gefunden. Bitte den Tag erneut öffnen.');return}
-let km=Number(kmEl.value);
-if(!(km>0)){alert('Bitte Kilometer eintragen.');return}
-summary=km+' km'+(timeEl&&Number(timeEl.value)?' · '+timeEl.value+' min':'')+(noteEl&&noteEl.value?' · '+noteEl.value:'');
+let km=Number(kmEl.value),rideTime=timeEl&&timeEl.value!==''?Number(timeEl.value):null;
+if(!(Number.isFinite(km)&&km>0)){alert('Bitte gültige Kilometer größer als 0 eintragen.');return}
+if(rideTime!==null&&!(Number.isFinite(rideTime)&&rideTime>0)){alert('Bitte eine gültige Fahrzeit größer als 0 eintragen oder das Feld leer lassen.');return}
+summary=km+' km'+(rideTime!==null?' · '+rideTime+' min':'')+(noteEl&&noteEl.value?' · '+noteEl.value:'');
 entry={type:'bike',date:new Date().toISOString().slice(0,10),distance:km,summary:'Woche '+week+', Tag '+day+': '+summary};
 }else{
 let template=activePlan.dayTemplates?.[key%activePlan.days];
@@ -401,7 +404,8 @@ if(!val){alert('Bitte Übung '+(j+1)+' auswählen.');return}
 let bikeInStrength=structured&&isBikeExercise(val),weightEl=bikeInStrength?$('minutes-'+key+'-'+j):$('weight-'+key+'-'+j);
 if(!weightEl){alert('Das Eingabefeld für '+val+' wurde nicht gefunden. Bitte den Tag erneut öffnen.');return}
 let raw=weightEl.value,weight=raw===''?null:Number(raw);
-if(bikeInStrength&&!(weight>0)){alert('Bitte die Fahrzeit in Minuten für Fahrrad eintragen.');return}
+if(raw!==''&&!(Number.isFinite(weight)&&weight>=0)){alert('Bitte für '+val+' ein gültiges Gewicht größer oder gleich 0 eintragen.');return}
+if(bikeInStrength&&!(Number.isFinite(weight)&&weight>0)){alert('Bitte die Fahrzeit in Minuten für Fahrrad eintragen.');return}
 if(structured&&week===1&&!isCoreLift(val)&&!isBikeExercise(val)){
  if(!(weight>0)){alert('Bitte in Woche 1 für '+val+' ein Ausgangsgewicht eintragen.');return}
  let reps=weekReps(val,week,ex.sets),pct=tablePercent(reps,weekRPE(week));
@@ -439,13 +443,12 @@ if(!Number.isInteger(index)||index<0||index>=logs.length)return;
 if(!confirm('Diesen Trainingseintrag endgültig aus dem Verlauf löschen?'))return;
 let entry=logs[index];
 logs.splice(index,1);
-if(activePlan){
- if(entry.planId===activePlan.id&&Number.isInteger(Number(entry.dayKey))){
-  let key=Number(entry.dayKey);activePlan.completed=activePlan.completed.filter(x=>Number(x.key)!==key);
- }else{
-  let match=activePlan.completed.find(x=>x.date===entry.date&&x.summary===entry.summary);
-  if(match)activePlan.completed=activePlan.completed.filter(x=>x!==match);
- }
+if(entry.planId&&Number.isInteger(Number(entry.dayKey))){
+ let ownerPlan=plans.find(p=>p.id===entry.planId);
+ if(ownerPlan)ownerPlan.completed=(ownerPlan.completed||[]).filter(x=>Number(x.key)!==Number(entry.dayKey));
+}else if(activePlan){
+ let match=activePlan.completed.find(x=>x.date===entry.date&&x.summary===entry.summary);
+ if(match)activePlan.completed=activePlan.completed.filter(x=>x!==match);
 }
 save();renderHistory();renderPlan();refresh()
 }
