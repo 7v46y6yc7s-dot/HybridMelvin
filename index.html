@@ -216,24 +216,30 @@ main{padding-bottom:calc(112px + env(safe-area-inset-bottom))!important}
 .exercise-library-item{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .exercise-delete{padding:6px 10px!important;font-size:11px!important;background:#38151d!important;border:1px solid #8d2639!important;color:#ff9aaa!important;min-width:64px}
 .rank-icon{width:29px;height:29px;flex:0 0 29px;display:block;color:var(--rank-color,#f4f4f5)}.rank-pro-icon{display:inline-flex;align-items:center;justify-content:center;min-width:29px;height:29px;font-size:15px;font-weight:1000;font-style:italic;letter-spacing:-1px;color:#ff526d}.rank-badge,.laurel-badge{display:inline-flex;align-items:center;gap:6px}.rank-badge{border:1px solid var(--line);border-radius:9px;padding:5px 8px}.laurel-badge{border:1px solid color-mix(in srgb,var(--rank-color) 45%,transparent);border-radius:9px;padding:5px 8px;color:var(--rank-color)}.strength-rank-icon{width:31px;height:31px;flex:0 0 31px;display:block;color:var(--rank-color,#f5f5f7)}.strength-rank-icon text{font-family:Arial,sans-serif;font-weight:900}.strength-rank-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:9px;padding:5px 8px;color:var(--rank-color,#f5f5f7)}.strength-rank-badge .rank-label{font-size:10px;font-weight:900;letter-spacing:.6px}.strength-rank-badge.rookie,.strength-rank-badge.beginner,.strength-rank-badge.athlet{--rank-color:#f5f5f7}.strength-rank-badge.bodybuilder,.strength-rank-badge.kraftsportler{--rank-color:#ff526d}.strength-rank-badge.elite{--rank-color:#c9cdd5}.strength-rank-badge.legend{--rank-color:#e6bd52}.km-rank-icon{width:31px;height:31px;flex:0 0 31px;display:block;color:var(--rank-color,#f5f5f7)}.km-rank-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:9px;padding:5px 8px;color:var(--rank-color,#f5f5f7)}.km-rank-badge .rank-label{font-size:10px;font-weight:900;letter-spacing:.5px}.km-rank-badge.rookie,.km-rank-badge.beginner,.km-rank-badge.rider{--rank-color:#f5f5f7}.km-rank-badge.roadracer,.km-rank-badge.gravelgrinder{--rank-color:#ff526d}.km-rank-badge.endurance{--rank-color:#c9cdd5}.km-rank-badge.legend{--rank-color:#e6bd52}
-/* STARTSEITE: drei zentrierte Rang-Kacheln nebeneinander */
+/* STARTSEITE: drei gleich hohe, zentrierte Rang-Kacheln */
 .strength-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;width:100%;align-items:stretch}
-.strength-stats>.stat{box-sizing:border-box;width:100%;min-width:0;padding:12px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.strength-stats>.stat>small{display:block;width:100%;font-size:clamp(8px,2.4vw,10px);line-height:1.2;text-align:center;letter-spacing:.35px;white-space:normal}
-.strength-stats .total-row{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;min-width:0;margin-top:8px}
+.strength-stats>.stat{box-sizing:border-box;width:100%;min-width:0;min-height:126px;height:100%;padding:12px 5px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center}
+.strength-stats>.stat>small{display:flex;align-items:center;justify-content:center;width:100%;min-height:25px;font-size:clamp(8px,2.35vw,10px);line-height:1.15;text-align:center;letter-spacing:.25px;white-space:normal}
+.strength-stats .total-row{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:7px;width:100%;min-width:0;margin-top:7px;flex:1}
 .strength-stats .total-row>strong{font-size:clamp(20px,6vw,27px);line-height:1.05;margin:0;text-align:center;white-space:nowrap}
-.strength-stats .rank-slot{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;white-space:normal}
-.strength-stats .rank-badge,.strength-stats .laurel-badge,.strength-stats .strength-rank-badge,.strength-stats .km-rank-badge{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:3px;max-width:100%;padding:4px 3px;white-space:normal;text-align:center;line-height:1.1}
-.strength-stats .rank-badge span,.strength-stats .laurel-badge span,.strength-stats .strength-rank-badge .rank-label,.strength-stats .km-rank-badge .rank-label{font-size:clamp(7px,2vw,9px);letter-spacing:0;line-height:1.1;text-align:center;white-space:normal;overflow-wrap:normal;word-break:normal}
+.strength-stats .rank-slot{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;min-height:42px;white-space:normal}
+.strength-stats .rank-badge,.strength-stats .laurel-badge,.strength-stats .strength-rank-badge,.strength-stats .km-rank-badge{display:flex;align-items:center;justify-content:center;flex-direction:column;flex-wrap:nowrap;gap:3px;max-width:100%;min-height:38px;padding:3px 2px;white-space:normal;text-align:center;line-height:1.1}
+.strength-stats .rank-badge span,.strength-stats .laurel-badge span,.strength-stats .strength-rank-badge .rank-label,.strength-stats .km-rank-badge .rank-label{display:block;font-size:clamp(7px,2vw,9px);letter-spacing:0;line-height:1.1;text-align:center;white-space:normal;overflow-wrap:anywhere;word-break:normal}
 .strength-stats .rank-badge svg,.strength-stats .laurel-badge svg,.strength-stats .strength-rank-icon,.strength-stats .km-rank-icon{width:21px;height:21px;flex:0 0 21px}
 .strength-stats .laurel-badge svg{width:21px;height:21px}
-@media(max-width:360px){
+#activePlan>.card>.stat{margin:12px 0 0;min-height:76px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center}
+#activePlan>.card>.row{position:relative;clear:both;margin-top:18px;padding-top:2px;align-items:stretch;gap:9px}
+#activePlan>.card>.row>button{min-width:0;line-height:1.25;white-space:normal}
+@media(max-width:390px){
  .strength-stats{gap:5px}
- .strength-stats>.stat{padding:9px 3px}
- .strength-stats>.stat>small{font-size:7.5px}
+ .strength-stats>.stat{min-height:126px;padding:10px 3px}
+ .strength-stats>.stat>small{font-size:7.5px;min-height:26px}
  .strength-stats .total-row>strong{font-size:19px}
+ .strength-stats .rank-slot{min-height:42px}
  .strength-stats .rank-badge span,.strength-stats .laurel-badge span,.strength-stats .strength-rank-badge .rank-label,.strength-stats .km-rank-badge .rank-label{font-size:6.5px}
  .strength-stats .rank-badge svg,.strength-stats .laurel-badge svg,.strength-stats .strength-rank-icon,.strength-stats .km-rank-icon{width:18px;height:18px;flex-basis:18px}
+ #activePlan>.card>.row{margin-top:20px;gap:7px}
+ #activePlan>.card>.row>button{padding:10px 8px;font-size:12px}
 }
 </style></head><body>
 <header><div class="row" style="align-items:center"><div style="flex:1"><div class="brand">HYBRID<span>MELVIN</span></div><div class="tag">KRÜPPELN · POWERN · KILOMETER SCHRUBBEN</div></div><div id="activeProfileBadge" class="pill">Profil</div></div></header>
