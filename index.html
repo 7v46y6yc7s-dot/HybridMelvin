@@ -367,11 +367,30 @@ if(core)return b===0?(w===5?6:5):b===1?(w===5?6:3):(w===5?6:w===4?1:2);
 return [10,9,8][b]||10;
 }
 function tablePercent(reps,rpe){let row=RPE_TABLE[Number(rpe)];return row&&reps>=1&&reps<=12?row[reps-1]/100:null}
+function actualBlockStart1RM(lift,block){
+if(!activePlan)return null;
+let firstWeek=block*5+1,startKey=(firstWeek-1)*activePlan.days,endKey=startKey+activePlan.days,best=null;
+(activePlan.completed||[]).forEach(done=>{
+let key=Number(done.key);
+if(key<startKey||key>=endKey)return;
+(done.exercises||[]).forEach(ex=>{
+if(ex.name!==lift||!(Number(ex.weight)>0))return;
+let reps=Number(ex.reps)||weekReps(lift,firstWeek),rpe=Number(ex.rpe)||weekRPE(firstWeek);
+let estimate=estimateTheoretical1RM(Number(ex.weight),reps,rpe);
+if(estimate&&(!best||estimate>best))best=estimate;
+});
+});
+return best;
+}
 function exerciseRecommendation(name,week,sets){
 if(!['strength','hybrid'].includes(activePlan?.type)||isBikeExercise(name))return null;
 let reps=weekReps(name,week,sets),rpe=weekRPE(week),pct=tablePercent(reps,rpe),base=null;
-if(isCoreLift(name)){let block=Math.floor((week-1)/5),key=name.toLowerCase().startsWith('kniebeuge')?'squat':name.toLowerCase().startsWith('bankdrücken')?'bench':'deadlift';base=activePlan.oneRMBlocks?.[block]?.[key]||activePlan.oneRM?.[key]}
-else base=activePlan.exerciseBases?.[name]?.oneRM;
+if(isCoreLift(name)){
+let block=Math.floor((week-1)/5),key=coreLiftKey(name);
+base=activePlan.oneRMBlocks?.[block]?.[key]||activePlan.oneRM?.[key];
+let actual=actualBlockStart1RM(name,block);
+if(actual&&week%5!==1)base=actual;
+}else base=activePlan.exerciseBases?.[name]?.oneRM;
 if(!base||!pct)return {value:null,reps,rpe,needsBase:!isCoreLift(name)};
 return {value:Math.round(base*pct*2)/2,reps,rpe,needsBase:false,pct:pct*100};
 }
@@ -542,7 +561,7 @@ if(structured&&week===1&&!isCoreLift(val)&&!isBikeExercise(val)){
  if(pct)baseUpdates[val]={oneRM:weight/pct,sourceWeight:weight,reps,rpe:weekRPE(week)};
 }
 let exerciseReps=plank?null:weekReps(val,week,ex.sets),exerciseRpe=weekRPE(week);
-if(core&&weight>0){let estimated=estimateTheoretical1RM(weight,exerciseReps,exerciseRpe),liftKey=coreLiftKey(val),block=Math.floor((week-1)/5);if(estimated&&liftKey){activePlan.oneRMBlocks=activePlan.oneRMBlocks||[];activePlan.oneRMBlocks[block]=activePlan.oneRMBlocks[block]||{...(activePlan.oneRM||{})};let previous=Number(activePlan.oneRMBlocks[block][liftKey])||0;if(estimated>previous)activePlan.oneRMBlocks[block][liftKey]=estimated;activePlan.oneRM=activePlan.oneRMBlocks[block];weights.push({name:val,sets:ex.sets,weight,reps:exerciseReps,rpe:exerciseRpe,theoretical1RM:estimated});continue}}
+if(core&&weight>0){let estimated=estimateTheoretical1RM(weight,exerciseReps,exerciseRpe),liftKey=coreLiftKey(val),block=Math.floor((week-1)/5);if(estimated&&liftKey){activePlan.oneRMBlocks=activePlan.oneRMBlocks||[];activePlan.oneRMBlocks[block]=activePlan.oneRMBlocks[block]||{...(activePlan.oneRM||{})};let firstWeek=block*5+1,firstKey=(firstWeek-1)*activePlan.days,hasEarlierActual=(activePlan.completed||[]).some(done=>Number(done.key)>=firstKey&&Number(done.key)<firstKey+activePlan.days&&(done.exercises||[]).some(item=>item.name===val&&Number(item.weight)>0));let previous=Number(activePlan.oneRMBlocks[block][liftKey])||0;if(week===firstWeek&&!hasEarlierActual)activePlan.oneRMBlocks[block][liftKey]=estimated;else if(estimated>previous)activePlan.oneRMBlocks[block][liftKey]=estimated;activePlan.oneRM=activePlan.oneRMBlocks[block];weights.push({name:val,sets:ex.sets,weight,reps:exerciseReps,rpe:exerciseRpe,theoretical1RM:estimated});continue}}
 weights.push(bikeInStrength||plank?{name:val,minutes:weight}:{name:val,sets:ex.sets,weight,reps:exerciseReps,rpe:exerciseRpe});
 }
 let noteEl=$('note-'+key),note=noteEl?noteEl.value:'';
